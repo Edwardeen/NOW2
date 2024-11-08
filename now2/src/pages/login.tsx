@@ -2,6 +2,7 @@
 
 import LogoIMG from "../public/logo.png"
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
 const MyForm = () => {
     const [username, setUsername] = useState('');
@@ -69,7 +70,7 @@ const MyForm = () => {
                     placeholder="Enter your password"
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="text-Tertiary">
-                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" className="w-8 h-8"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-8 h-8" />}
+                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" className="w-6 h-6"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-6 h-6" />}
                 </button>
             </label>
 
@@ -81,6 +82,8 @@ const MyForm = () => {
 };
 
 export default function Page() {
+
+    const router = useRouter()
     return (
         <div className="bg-Green w-screen h-screen flex items-center justify-center">
 <div id="cardBg" className="flex flex-col w- h-3/4 items-center gap-2.5 px-[83px] py-[42px] relative bg-Cream rounded-[20px] justify-between">
@@ -120,7 +123,7 @@ export default function Page() {
 
             </div>
   
-            <div id="registerText" className="btn btn-ghost relative w-[346px] h-[21px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-xl text-center tracking-[0] leading-[normal] whitespace-nowrap m-20">
+            <div id="registerText" className="btn btn-ghost relative w-[346px] h-[21px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-xl text-center tracking-[0] leading-[normal] whitespace-nowrap m-20" onClick={() => router.push('/register')}>
         <span className="[font-family:'Noto_Sans-Medium',Helvetica] font-medium text-black text-xl tracking-[0]">
             Haven’t got an account?{" "}
         </span>
