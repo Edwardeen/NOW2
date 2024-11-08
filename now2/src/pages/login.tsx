@@ -1,5 +1,5 @@
 "use client";
-
+import 'tailwindcss/tailwind.css';
 import LogoIMG from "../public/logo.png"
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'
