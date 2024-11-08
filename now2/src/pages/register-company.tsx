@@ -9,18 +9,13 @@ const MyForm = () => {
     const [familyName, setFamilyName] = useState('');
     const [dob, setDob] = useState('');
     const [email, setEmail] = useState('');
-    const [icNumber, setIC] = useState('');
     const [username, setUsername] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
-
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
-        if (name === 'icNumber') {
-            setIC(value);
-        }
         switch (name) {
             case 'frontName':
                 setFrontName(value);
@@ -33,9 +28,6 @@ const MyForm = () => {
                 break;
             case 'email':
                 setEmail(value);
-                break;
-            case 'icNumber':
-                setIC(value);
                 break;
             case 'phoneNumber':
                 setPhoneNumber(value);
@@ -51,13 +43,6 @@ const MyForm = () => {
         }
     };
 
-    const isNumberKey = (evt: React.KeyboardEvent<HTMLInputElement>) => {
-        const charCode = (evt.which) ? evt.which : evt.keyCode;
-        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-            evt.preventDefault(); // Prevent the default action if it's not a number
-        }
-    };
-
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
@@ -67,8 +52,6 @@ const MyForm = () => {
         // Here you can handle the form submission, e.g., send data to an API
         console.log('Front Name:', frontName);
         console.log('Family Name:', familyName);
-        console.log('Username:', username);
-        console.log('IC Number:', icNumber);
         console.log('Date of Birth:', dob);
         console.log('Email:', email);
         console.log('Phone Number:', phoneNumber);
@@ -81,7 +64,6 @@ const MyForm = () => {
         setUsername;
         setPhoneNumber('');
         setPassword('');
-        setIC('');
     };
 
     return (
@@ -105,22 +87,12 @@ const MyForm = () => {
                 />
 
            </div>
-
            <input
                 type="text"
                 name="username"
                 value={username}
                 onChange={handleInputChange}
                 placeholder="Username"
-                className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
-            />
-            <input
-                type="text"
-                name="icNumber"
-                value={icNumber}
-                onChange={handleInputChange}
-                onKeyPress={isNumberKey} // Add the onKeyPress event here
-                placeholder="IC Number"
                 className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
             />
            
@@ -160,7 +132,7 @@ const MyForm = () => {
                     {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" className="w-6 h-6"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-6 h-6" />}
                 </button>
             </label>
-            <button type="submit" className="btn bg-Green text-Tertiary flex mx-auto w-40">
+            <button type="submit" className="mx-auto btn bg-Green text-Tertiary flex w-40">
                 Register
             </button>
         </form>
@@ -197,18 +169,20 @@ export default function Page() {
                   Be Wiser Be Greener
                 </div>
   
-                <div className="flex items-center justify-center gap-2.5 px-0 py-[27px] relative flex-[0_0_auto] mb-[-65.00px]" >
-                  <div className="btn btn-ghost relative flex-1 mt-8 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-xl text-center tracking-[0] leading-[normal]" onClick={() => router.push('/register-company')}>
+                <div className="flex items-center justify-center gap-2.5 my-5 px-0 py-[27px] relative flex-[0_0_auto] mb-[-65.00px]" >
+                  <div className="btn btn-ghost relative flex-1 mt-8 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-xl text-center tracking-[0] leading-[normal]" onClick={() => router.push('/register')}>
                     {" "}
                     Registering as {" "}
-                    <span className="underline">User</span>
+                    <span className="underline">Company / Organization</span>
                     
                   </div>
                 </div>
               </div>
-              <div className='mt-6'>
+                <div className='mt-12'>
                 <MyForm />
                 </div>
+              
+
             </div>
   
             <div id="registerText" className="btn btn-ghost relative w-[346px] h-max [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-xl text-center tracking-[0] leading-[normal] whitespace-nowrap mt-20" onClick={() => router.push('/login')}>

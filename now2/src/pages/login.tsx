@@ -74,7 +74,7 @@ const MyForm = () => {
                 </button>
             </label>
 
-            <button type="submit" className="btn bg-Green text-Tertiary flex">
+            <button type="submit" className="btn bg-Green text-Tertiary flex w-40 mx-auto">
                 Login
             </button>
         </form>
@@ -86,7 +86,7 @@ export default function Page() {
     const router = useRouter()
     return (
         <div className="bg-Green w-screen h-screen flex items-center justify-center">
-<div id="cardBg" className="flex flex-col w- h-3/4 items-center gap-2.5 px-[83px] py-[42px] relative bg-Cream rounded-[20px] justify-between">
+<div id="cardBg" className="flex flex-col w-1/2 h-3/4 items-center gap-2.5 px-[83px] py-[42px] relative bg-Cream rounded-[20px] justify-between">
         <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 relative flex-[0_0_auto] mb-[-180.00px]">
           <div className="inline-flex flex-col items-center relative flex-[0_0_auto]">
             <div className="inline-flex flex-col items-center gap-[70px] relative flex-[0_0_auto]">
@@ -114,7 +114,7 @@ export default function Page() {
                 <div className="flex w-[148px] items-center justify-center gap-2.5 px-0 py-[27px] relative flex-[0_0_auto] mb-[-65.00px]">
                   <div className="relative flex-1 mt-8 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-xl text-center tracking-[0] leading-[normal]">
                     {" "}
-                    Sign-in as User
+                    Sign-in
                   </div>
                 </div>
               </div>
