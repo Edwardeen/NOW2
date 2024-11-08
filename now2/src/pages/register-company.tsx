@@ -61,7 +61,7 @@ const MyForm = () => {
         setFamilyName('');
         setDob('');
         setEmail('');
-        setUsername;
+        setUsername('');
         setPhoneNumber('');
         setPassword('');
     };
@@ -129,7 +129,7 @@ const MyForm = () => {
                     className="grow placeholder-Primary"
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="text-Tertiary">
-                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" className="w-6 h-6"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-6 h-6" />}
+                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" alt="eye off" className="w-6 h-6"/> : <img alt="eye on" src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-6 h-6" />}
                 </button>
             </label>
             <button type="submit" className="mx-auto btn bg-Green text-Tertiary flex w-40">

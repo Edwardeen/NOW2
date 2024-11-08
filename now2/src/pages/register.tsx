@@ -78,7 +78,7 @@ const MyForm = () => {
         setFamilyName('');
         setDob('');
         setEmail('');
-        setUsername;
+        setUsername('');
         setPhoneNumber('');
         setPassword('');
         setIC('');
