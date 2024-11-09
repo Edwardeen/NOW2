@@ -31,6 +31,8 @@ const MyForm = () => {
         setPassword('');
     };
 
+    const router = useRouter()
+
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <label className="input input-bordered bg-Green text-Tertiary flex items-center gap-2">
@@ -73,7 +75,7 @@ const MyForm = () => {
                     {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=FFFFFF" className="w-5 h-5"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=FFFFFF" className="w-5 h-5" />}
                 </button>
             </label>
-            <button type="submit" className="btn bg-Green text-Tertiary flex w-40 mx-auto">
+            <button type="submit" className="btn bg-Green text-Tertiary flex w-40 mx-auto" onClick={() => router.push('/User/home')}>
                 Login
             </button>
         </form>
