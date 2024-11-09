@@ -30,7 +30,7 @@ const Header: React.FC = () => {
               className="object-contain shrink-0"
             />
           </div>
-          <div className="btn btn-ghost -m-3">
+          <div className="btn btn-ghost -m-3" onClick={() => router.push('/User/home')}>
             <Image
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/05adc747696cb083bf4d95d598b6fc127ee1991b0e88f61e3e0d40ed6b51b6cb?apiKey=ca09dd87004c45a6bc6f856 9245d5eaa&"
@@ -38,10 +38,10 @@ const Header: React.FC = () => {
               width={20}
               height={20}
               className="object-contain shrink-0"
-              onClick={() => router.push('/User/home')}
+              
             />
           </div>
-          <div className="btn btn-ghost -m-3">
+          <div className="btn btn-ghost -m-3" onClick={handleBack}>
             <Image
               loading="lazy"
               src="https://cdn.builder.io/api/v1/image/assets/TEMP/167f7684b68c467f8d70807e2d68078559103884e28eb994b1dd5309bcd0b1be?apiKey=ca09dd87004c45a6bc6f8569245d5eaa&"
@@ -49,7 +49,7 @@ const Header: React.FC = () => {
               width={20}
               height={20}
               className="object-contain shrink-0"
-              onClick={handleBack}
+              
             />
           </div>
         </div>

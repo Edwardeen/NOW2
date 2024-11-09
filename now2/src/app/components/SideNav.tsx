@@ -1,4 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import Image from 'next/image';
+import LogoIMG from "../../public/logo.png";
+import { useRouter } from 'next/router';
 
 interface SideNavProps {
   isOpen: boolean;
@@ -7,6 +10,7 @@ interface SideNavProps {
 
 const SideNav: React.FC<SideNavProps> = ({ isOpen, onClose }) => {
   const sideNavRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const handleClickOutside = (event: MouseEvent) => {
     if (sideNavRef.current && !sideNavRef.current.contains(event.target as Node)) {
@@ -34,16 +38,39 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen, onClose }) => {
       <div
         ref={sideNavRef}
         className={`fixed top-0 left-0 w-64 h-full bg-Cream text-white shadow-lg transition-transform transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} z-50`}
-      >
-        <div className="p-4">
-        <button onClick={onClose} className="mt-4 text-red-500">Close</button>
-          <h2 className="text-lg font-bold">Navigation</h2>
-          <ul>
-            <li className="py-2"><a href="/link1" className="hover:underline">Link 1</a></li>
-            <li className="py-2"><a href="/link2" className="hover:underline">Link 2</a></li>
-            <li className="py-2"><a href="/link3" className="hover:underline">Link 3</a></li>
-            <li className="py-2"><a href="/link4" className="hover:underline">Link 4</a></li>
-          </ul>
+      >{/* Logo & Name */}
+        <div className="p-4 flex flex-col h-full justify-between">
+          <div>
+            <button onClick={onClose} className="mt-4">
+            <img
+                src="https://img.icons8.com/?size=100&id=40217&format=png&color=000000"
+                alt="backbutton"
+                width={24}
+                height={24}
+                />
+            </button>
+            <div className='flex flex-col gap-5 justify-start items-end mx-2'>
+              <Image
+                src={LogoIMG}
+                alt='logo'
+                width={100}
+                height={100}
+                />
+              <h2 className="text-lg font-bold text-Tertiary justify-end text-end">Net <br /> Zero <br /> Waste <br /> Wise</h2>
+            </div>
+          </div>
+        {/* The Navigations for SideBar */}
+
+          <div className='flex flex-col justify-normal items-start mx-4 gap-4 mt-10'>
+            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Home</span>
+            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/landfills/landfills-chooseArea')}>Donate</span>
+            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Profile</span>
+            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Settings</span>
+            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Credits</span>
+          </div>
+          <div className='btn btn-outline bg-Green justify-center mt-auto' onClick={() => router.push('/login')}>
+            <span className='text-Tertiary'>Logout</span>
+          </div>
           
         </div>
       </div>
