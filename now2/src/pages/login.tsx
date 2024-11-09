@@ -70,10 +70,9 @@ const MyForm = () => {
                     placeholder="Enter your password"
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="text-Tertiary">
-                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" className="w-6 h-6"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-6 h-6" />}
+                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=FFFFFF" className="w-5 h-5"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=FFFFFF" className="w-5 h-5" />}
                 </button>
             </label>
-
             <button type="submit" className="btn bg-Green text-Tertiary flex w-40 mx-auto">
                 Login
             </button>

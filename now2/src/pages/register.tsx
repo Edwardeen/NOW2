@@ -15,6 +15,14 @@ const MyForm = () => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
+    const [address, setAddress] = useState({
+        zipCode: '',
+        addressLine1: '',
+        addressLine2: '',
+        province: '',
+        city: '',
+        country: ''
+    });
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -46,8 +54,27 @@ const MyForm = () => {
             case 'username':
                 setUsername(value);
                 break;
-            default:
-                break;
+                case 'zipCode':
+                    setAddress({ ...address, zipCode: value });
+                    break;
+                case 'addressLine1':
+                    setAddress({ ...address, addressLine1: value });
+                    break;
+                case 'addressLine2':
+                    setAddress({ ...address, addressLine2: value });
+                    break;
+                case 'province':
+                    setAddress({ ...address, province: value });
+                    break;
+                case 'city':
+                    setAddress({ ...address, city: value });
+                    break;
+                case 'country':
+                    setAddress({ ...address, country: value });
+                    break;
+                default:
+                    break;
+
         }
     };
 
@@ -82,10 +109,19 @@ const MyForm = () => {
         setPhoneNumber('');
         setPassword('');
         setIC('');
+        setAddress({
+            zipCode: '',
+            addressLine1: '',
+            addressLine2: '',
+            province: '',
+            city: '',
+            country: ''
+        });
     };
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 placeholder-Primary">
+           <span className="label-text text-Tertiary">Enter your Name</span>
            <div className='flex flex-row gap-3'>
                 <input
                 type="text"
@@ -93,7 +129,7 @@ const MyForm = () => {
                 value={frontName}
                 onChange={handleInputChange}
                 placeholder="Front Name"
-                className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary w-1/2"
                  />
                 <input
                 type="text"
@@ -101,11 +137,12 @@ const MyForm = () => {
                 value={familyName}
                 onChange={handleInputChange}
                 placeholder="Family Name"
-                className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary w-1/2"
                 />
 
            </div>
 
+           <span className="label-text text-Tertiary">Choose a Username for Login</span>
            <input
                 type="text"
                 name="username"
@@ -147,6 +184,64 @@ const MyForm = () => {
                 placeholder="Phone Number (+60)"
                 className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
             />
+
+<span className="label-text text-Tertiary">Address of Domicile </span>
+
+<input
+                type="text"
+                name="addressLine1"
+                value={address.addressLine1}
+                onChange={handleInputChange}
+                placeholder="Address Line 1"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
+            />
+            <input
+                type="text"
+                name="addressLine2"
+                value={address.addressLine2}
+                onChange={handleInputChange}
+                placeholder="Address Line 2"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
+            />
+
+            
+            <div className='flex flex-row gap-2 mx-auto justify-center'>
+
+            <input
+                type="text"
+                name="province"
+                value={address.province}
+                onChange={handleInputChange}
+                placeholder="Province"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary w-1/3"
+            />
+            <input
+                type="text"
+                name="city"
+                value={address.city}
+                onChange={handleInputChange}
+                placeholder="City"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary w-1/3"
+            />
+                        <input
+                type="text"
+                name="zipCode"
+                value={address.zipCode}
+                onChange={handleInputChange}
+                placeholder="Code"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary w-1/3"
+            />
+            </div>
+
+            <input
+                type="text"
+                name="country"
+                value="Malaysia"
+                onChange={handleInputChange}
+                placeholder="Country"
+                className="input input-bordered bg-Green text-Tertiary placeholder-Primary"
+            />
+
             <label className="input input-bordered bg-Green text-Tertiary flex items-center gap-2 placeholder-Primary">
                 <input
                     type={showPassword ? 'text' : 'password'}
@@ -157,8 +252,10 @@ const MyForm = () => {
                     className="grow placeholder-Primary"
                 />
                 <button type="button" onClick={togglePasswordVisibility} className="text-Tertiary">
-                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=000000" className="w-6 h-6"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=000000" className="w-6 h-6" />}
+                    {showPassword ? <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=FFFFFF" className="w-5 h-5"/> : <img src="https://img.icons8.com/?size=100&id=59814&format=png&color=FFFFFF" className="w-5 h-5" />}
                 </button>
+                
+                
             </label>
             <button type="submit" className="btn bg-Green text-Tertiary flex mx-auto w-40">
                 Register
@@ -171,8 +268,8 @@ export default function Page() {
 
     const router = useRouter()
     return (
-        <div className="bg-Green w-screen h-dvh flex items-center justify-center">
-<div id="cardBg" className="flex flex-col items-center gap-2.5 w-1/2 bg-Cream rounded-[20px]">
+        <div className="bg-Green w-screen flex items-center justify-center">
+<div id="cardBg" className="flex flex-col items-center gap-2.5 w-1/2 my-20 bg-Cream rounded-[20px]">
         <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 flex-[0_0_auto]">
           <div className="inline-flex flex-col items-center flex-[0_0_auto]">
             <div className="inline-flex flex-col items-center gap-[70px] flex-[0_0_auto]">
