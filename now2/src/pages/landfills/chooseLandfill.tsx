@@ -29,8 +29,10 @@ const ChooseLandfill: React.FC = () => {
           <h1 className="text-Tertiary font-extrabold text-xl mb-4 ml-auto">📍 Chosen City: {city}</h1>
         </div>
         
-        <div className="overflow-auto max-h-[80 vh] w-full px-4">
-          <Landfills />
+        <div className="overflow-auto h-dvh w-full px-4">
+          <div className="flex flex-col gap-4 items-start"> {/* Adjusted to justify from the start */}
+            <Landfills />
+          </div>
         </div>
       </div>
     </div>

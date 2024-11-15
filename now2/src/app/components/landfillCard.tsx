@@ -13,7 +13,7 @@ interface LandfillCardProps {
 const LandfillCard: React.FC<LandfillCardProps> = ({ id, imageUri, name, phoneNumber, address }) => {
   return (
     <Link href={`/landfills/${id}`}>
-      <div className="flex flex-col justify-center p-4 text-xl rounded-3xl bg-stone-400 text-zinc-800 mb-4 cursor-pointer">
+      <div className="flex flex-col justify-center p-4 text-xl rounded-3xl bg-Green text-Tertiary cursor-pointer">
         <div className="flex flex-wrap flex-1 gap-7">
           <img
             src={imageUri}
@@ -47,7 +47,33 @@ const dummyData = [
     phoneNumber: '036277-6622',
     address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
   },
-  // Add more landfills as needed
+  {id: '3',
+  imageUri: 'https://tse3.mm.bing.net/th?id=OIP.LQhTQBMr_aNk7toQvWk4NQHaEb&pid=Api&P=0&h=180 ',
+  name: 'Landfill no. 3',
+  phoneNumber: '036277-6622',
+  address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
+},
+{
+  id: '1',
+  imageUri: 'https://tse3.mm.bing.net/th?id=OIP.LQhTQBMr_aNk7toQvWk4NQHaEb&pid=Api&P=0&h=180',
+name: 'Landfill no. 1',
+  phoneNumber: '036277-6611',
+  address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
+},
+{
+  id: '2',
+  imageUri: 'https://tse3.mm.bing.net/th?id=OIP.LQhTQBMr_aNk7toQvWk4NQHaEb&pid=Api&P=0&h=180 ',
+  name: 'Landfill no. 2',
+  phoneNumber: '036277-6622',
+  address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
+},
+{id: '3',
+imageUri: 'https://tse3.mm.bing.net/th?id=OIP.LQhTQBMr_aNk7toQvWk4NQHaEb&pid=Api&P=0&h=180 ',
+name: 'Landfill no. 3',
+phoneNumber: '036277-6622',
+address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
+},  
+// Add more landfills as needed
 ];
 
 // Component to render all landfill cards

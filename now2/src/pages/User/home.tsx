@@ -5,12 +5,14 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation'
 import Header from '@/app/components/header';
 import WaqfCard from '@/app/components/card'
+import History from '@/app/components/historyCard'
+import Transactions from '@/app/components/transactionCard';
 
 export default function Page() {
 
     const router = useRouter()
     return (
-        <div className="flex flex-col justify-center h-screen bg-Green">
+        <div className="flex flex-col justify-center h-max bg-Green">
             <div className='mx-24'>
                 <div className='flex flex-row justify-between items-center my-2'>
                     <Header />
@@ -29,7 +31,7 @@ export default function Page() {
             </div>
             
             {/*The one below this is for the contents of the body (Cream Box)*/}
-            <div className='flex flex-col mx-auto w-11/12 h-5/6 items-start gap-10 px-[83px] py-[42px] relative bg-Cream rounded-[20px]'>
+            <div className='flex flex-col mx-auto w-11/12 h-max mb-20 items-start gap-10 px-[83px] py-[42px] relative bg-Cream rounded-[20px]'>
                 <div className='flex flex-col gap-5 items-center mx-auto'>
                     <span className='text-Tertiary font-bold'>Welcome User!</span>
                     <span className='text-Tertiary font-black'>Total Donations in November: </span>
@@ -46,7 +48,7 @@ export default function Page() {
                         </div>
                     </div>
                     </div>
-                    <div className='btn btn-ghost bg-Green text-Tertiary font-extrabold w-1/5 rounded-2xl h-full flex flex-col' onClick={() => router.push('../landfills/chooseArea')}>
+                    <div className='btn btn-ghost bg-Green text-Tertiary font-extrabold w-1/5 rounded-2xl h-full flex flex-col py-20' onClick={() => router.push('../landfills/chooseArea')}>
                         <img
                             src="https://img.icons8.com/?size=100&id=60996&format=png&color=000000"
                             alt='leaf'
@@ -56,15 +58,27 @@ export default function Page() {
                         <span className='mx-auto'>Find Landfills near you!
                         </span>                    
                     </div>
-                    
-                </div>
-                <div className='flex flex-col gap-4'>
-                <span className='text-Tertiary font-extrabold text-2xl'>Your Donation History:</span>
-                <WaqfCard/>
+
+                {/* This one below is to show Donation history */}   
                 </div>
                 
-            </div>
+                <span className='text-Tertiary font-extrabold text-2xl mx-auto'>Check Your Transaction:</span>
+                <div>
+                    <div className='flex flex-col gap-4'>
+                        <Transactions/>
+                    </div>
+                </div>
 
+                {/* This one below is to show transaction history */}
+                <span className='text-Tertiary font-extrabold text-2xl mx-auto'>History:</span>
+                <div className='flex flex-col mx-auto w-full h-5/6 items-start relative bg-Cream rounded-[20px] overflow-hidden'> {/* Changed overflow-x-hidden to overflow-hidden */}
+    
+    <div className='flex flex-col gap-4 h-full overflow-y-auto'> {/* Set height and enable vertical scrolling */}
+        <History />
+    </div>
+</div>
+
+        </div>
         </div>
     )
 };
