@@ -1,9 +1,9 @@
 name: Deploy
 on:
   push:
-    branches: main
+    branches: deploy
   pull_request:
-    branches: main
+    branches: deploy
 
 jobs:
   deploy:
@@ -39,6 +39,6 @@ jobs:
         with:
           project: "edwardeen-now2-49"
           entrypoint: "jsr:@deno/nextjs-start"
-          root: "now2"
+          root: ""
           
           
