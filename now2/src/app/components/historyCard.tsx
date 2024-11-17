@@ -1,133 +1,189 @@
-// components/HistoryCard.tsx
+// app/components/HistoryCard.tsx
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 interface HistoryCardProps {
   id: string;
-  imageUri: string;
+  imageUrl: string;
   waqfName: string;
-  cause: string; // Removed status from here
-  date: string;
+  historyDate: string;
+  totalTransferred: number;
+  historyDescription: string;
+  landfillName: string;
 }
 
-const HistoryCard: React.FC<HistoryCardProps> = ({ id, imageUri, waqfName, cause, date }) => {
-    return (
-      <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green text-Tertiary mb-4 cursor-pointer w-[300px] max-h-[400px]"> {/* Set a fixed width for the card */}
-        <div className='h-1/3 overflow-hidden rounded-3xl'> {/* Allow overflow hidden on the container */}
-          <Image
-            loading="lazy"
-            src={imageUri}
-            alt={`Image of ${waqfName}`}
-            className="object-cover rounded-3xl" // Use object-cover to ensure the image covers the area
-            style={{ maxHeight: '200px' }} // Set max height directly on the image
-            width={600} // Adjust width as needed
-            height={200} // You can keep this if you want to maintain aspect ratio
-          />
-        </div>
-        
-        <div className="flex flex-col mt-2 overflow-hidden"> {/* Allow overflow hidden on the text container */}
-          <div className="flex flex-wrap justify-between items-center w-full text-3xl">
-            <div className=" my-auto font-bold">
-              <span>{waqfName}</span>
-            </div>
-          </div>
-          <div className="mt-5">
-            <span>Cause: {cause}</span>
-          </div>
-          <div className="mt-5">
-            <span>Date: {date}</span>
-          </div>
-          <div className="flex justify-between mt-5">
-            <Link href={`/transactions/${id}`}>
-              <button className="bg-blue-500 text-white rounded-md p-2 w-1/2 mr-1">
-                Check Transaction Process
-              </button>
-            </Link>
-            <Link href={`/receipts/${id}`}>
-              <button className="bg-green-500 text-white rounded-md p-2 w-1/2 ml-1">
-                Download Receipt
-              </button>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+const HistoryCard: React.FC<HistoryCardProps> = ({
+  id,
+  imageUrl,
+  waqfName,
+  historyDate,
+  totalTransferred,
+  historyDescription,
+  landfillName,
+}) => {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push(`/User/history/${id}`);
   };
 
-// Dummy data creation for history cards
-const dummyHistoryData = [
-  {
-    id: '1',
-    imageUri: 'https://th.bing.com/th/id/OIP.ci1E7m8wCISyHZ6um8z01gHaDt?w=337&h=175&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 1',
-    cause: 'Environmental Awareness', // Updated to keep cause
-    date: '2023-10-01',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 2',
-    cause: 'Waste Reduction', // Updated to keep cause
-    date: '2023-10-02',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 2',
-    cause: 'Waste Reduction', // Updated to keep cause
-    date: '2023-10-02',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 2',
-    cause: 'Waste Reduction', // Updated to keep cause
-    date: '2023-10-02',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 2',
-    cause: 'Waste Reduction', // Updated to keep cause
-    date: '2023-10-02',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 2',
-    cause: 'Waste Reduction', // Updated to keep cause
-    date: '2023-10-02',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    waqfName: 'Waqf Project 2',
-    cause: 'Waste Reduction', // Updated to keep cause
-    date: '2023-10-02',
-  },
-  
-  // Add more history items as needed
-];
-
-// Component to render all history cards
-const History: React.FC = () => {
   return (
-    <div className="flex overflow-x-auto p-4"> {/* Enable horizontal scrolling */}
-      <div className="flex flex-row space-x-4"> {/* Arrange items in a row with space between */}
-        {dummyHistoryData.map((history) => (
-          <HistoryCard
-            key={history.id}
-            id={history.id}
-            imageUri={history.imageUri}
-            waqfName={history.waqfName}
-            cause={history.cause} // Pass cause
-            date={history.date}
-          />
-        ))}
+    <div
+      className="flex flex-col p-4 rounded-3xl bg-Green text-Tertiary mb-4 cursor-pointer max-w-[550px] h-72"
+      onClick={handleCardClick}
+    >
+      <div className="flex flex-wrap px-4 mt-4">
+        <div className="flex flex-col gap-5 justify-between items-center w-full text-3xl">
+          <div className="self-stretch my-auto font-bold text-3xl">
+            <span>{waqfName} </span>
+            
+          </div>
+          
+          <div className="self-stretch my-auto font-semibold text-3xl">
+            <span>{landfillName}</span>
+          </div>     
+             
+        <div className="self-stretch my-auto font-semibold text-xl">
+          <span>History Date: {historyDate}</span>
+        </div>
+        <div className="self-stretch my-auto font-semibold text-xl">
+          <span>Total Transferred: RM{totalTransferred.toFixed(2)}</span>
+        </div>
+        <div className="self-stretch my-auto font-semibold text-sm">
+        <span>Id: {id}</span>
+        </div >
+        
+        </div>
+
       </div>
     </div>
   );
 };
 
-export default History;
+// app/components/Histories.tsx
+import { useEffect, useState } from 'react';
+
+interface HistoriesProps {
+  userId: string | null;
+  userType: string | null;
+}
+
+interface HistoryItem {
+  id: string;
+  waqfName: string;
+  historyDate: string;
+  totalTransferred: number;
+  historyDescription: string;
+  landfillName: string;
+  imageUrl: string;
+}
+
+interface WaqfData {
+  waqfName: string;
+  imageUrl: string;
+}
+
+const Histories: React.FC<HistoriesProps> = ({ userId, userType }) => {
+  const [histories, setHistories] = useState<HistoryItem[]>([]);
+  const [waqfDataMap, setWaqfDataMap] = useState<Record<string, WaqfData>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchHistories = async () => {
+      if (!userId) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Fetch history data
+        const response = await fetch(`/api/history/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch histories');
+        }
+        const data = await response.json();
+
+        // Extract unique Waqf names
+        const waqfNames = Array.from(new Set(data.map((history: any) => history.WaqfName)));
+
+        // Fetch all Waqf data in a single call
+        const waqfResponse = await fetch(`/api/waqfs`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ waqfNames }),
+        });
+
+        if (!waqfResponse.ok) {
+          throw new Error('Failed to fetch Waqf data');
+        }
+
+        const waqfDataArray: WaqfData[] = await waqfResponse.json();
+
+        // Create a map of Waqf data for quick lookup
+        const waqfDataMap = waqfDataArray.reduce((map, waqf) => {
+          map[waqf.waqfName] = waqf;
+          return map;
+        }, {} as Record<string, WaqfData>);
+
+        // Enrich history data with Waqf data
+        const enrichedHistories = data.map((history: any) => {
+          const waqfData = waqfDataMap[history.WaqfName] || {};
+          return {
+            id: history.id,
+            waqfName: history.WaqfName,
+            imageUrl: waqfData.imageUrl || '',
+            historyDate: history.historyDate,
+            totalTransferred: history.totalTransferred,
+            historyDescription: history.historyDescription,
+            landfillName: history.LandfillName,
+          };
+        });
+
+        setHistories(enrichedHistories);
+        setWaqfDataMap(waqfDataMap);
+      } catch (error: any) {
+        console.error('Error fetching histories:', error);
+        setError('Could not load histories. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistories();
+  }, [userId]);
+
+  if (loading) {
+    return <div className="text-center text-gray-500">Loading history...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  if (!histories.length) {
+    return <div className="text-center text-gray-500">No history records found.</div>;
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {histories.map((history) => (
+        <HistoryCard
+          key={history.id}
+          id={history.id}
+          imageUrl={history.imageUrl}
+          waqfName={history.waqfName}
+          historyDate={new Date(history.historyDate).toLocaleDateString()}
+          totalTransferred={history.totalTransferred}
+          historyDescription={history.historyDescription}
+          landfillName={history.landfillName}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default Histories;

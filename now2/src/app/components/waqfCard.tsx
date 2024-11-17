@@ -1,43 +1,46 @@
 // components/CauseCard.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-interface CauseCardProps {
-  id: string;
-  imageUri: string;
-  name: string;
-  phoneNumber: string;
-  address: string;
-  cause: string;
+interface Waqf {
+  id: number; // Change to number if your ID is an integer
+  imageUrl: string;
+  waqfName: string;
+  waqfPhoneNumber: string;
+  waqfAddress: string;
+  causes: string; // Add causes as a string
 }
 
-const CauseCard: React.FC<CauseCardProps> = ({ id, imageUri, name, phoneNumber, address, cause }) => {
+const CauseCard: React.FC<Waqf> = ({ id, imageUrl, waqfName, waqfPhoneNumber, waqfAddress, causes }) => {
   return (
     <Link href={`/waqfs/${id}`}>
-      <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green text-zinc-800 mb-4 cursor-pointer max-w-[550px]">
-        <Image
+      <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green/80 text-zinc-800 mb-4 cursor-pointer h-80 w-full">
+        <div className='flex h-1/3 w-full'>
+            <Image
           loading="lazy"
-          src={imageUri}
-          alt={`Image of ${name}`}
-          className="object-contain rounded-3xl aspect-[3.04] w-full"
-          width={600} // Adjust wid th as needed
-          height={200} // Adjust height as needed
+          src={imageUrl}
+          alt={`Image of ${waqfName}`}
+          className="object-cover rounded-3xl w-full h-72 overflow-hidden"
+          width={400}
+          height={200}
         />
-        <div className="flex flex-col px-4 mt-4">
-          <div className="flex flex-wrap gap-10 justify-between items-center w-full text-3xl">
-            <div className="self-stretch my-auto font-bold">
-              <span>{name}</span>
+        </div>
+        
+        <div className="flex flex-col px-4 h-2/3 bg-gradient-to-b from-black/0 to-black/95 items-wrap rounded-3xl text-white">
+          <div className="flex flex-col gap-5 mb-2 justify-between my-auto items-center w-full text-3xl">
+            <div className="self-stretch text-4xl my-auto font-bold">
+              <span>{waqfName}</span>
             </div>
-            <div className="self-stretch my-auto font-semibold">
-              <span>{phoneNumber}</span>
+            <div className="self-stretch text-sm font-semibold">
+              <span>{waqfPhoneNumber}</span>
             </div>
           </div>
-          <div className="mt-5">
-            <span>{address}</span>
+          <div className="text-sm">
+            <span>{waqfAddress}</span>
           </div>
-          <div className="mt-5 font-semibold">
-            <span>Cause: {cause}</span>
+          <div className="font-semibold text-sm pb-3">
+            <span>Cause: {causes}</span> {/* Display the causes here */}
           </div>
         </div>
       </div>
@@ -45,40 +48,44 @@ const CauseCard: React.FC<CauseCardProps> = ({ id, imageUri, name, phoneNumber, 
   );
 };
 
-// Dummy data creation
-const dummyCauseData = [
-  {
-    id: '1',
-    imageUri: 'https://th.bing.com/th/id/OIP.ci1E7m8wCISyHZ6um8z01gHaDt?w=337&h=175&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    name: 'Cause no. 1',
-    phoneNumber: '036277-6611',
-    address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
-    cause: 'Environmental Awareness',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    name: 'Cause no. 2',
-    phoneNumber: '036277-6622',
-    address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
-    cause: 'Waste Reduction',
-  },
-  // Add more causes as needed
-];
-
 // Component to render all cause cards
 const Causes: React.FC = () => {
+  const [waqfs, setWaqfs] = useState<Waqf[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWaqfs = async () => {
+      try {
+        const response = await fetch('/api/waqfs');
+        if (!response.ok) {
+          throw new Error('Failed to fetch waqfs');
+        }
+        const data = await response.json();
+        setWaqfs(data);
+      } catch (error: any) {
+        console.error('Error fetching waqfs:', error);
+        setError(error.message);
+      }
+    };
+
+    fetchWaqfs();
+  }, []);
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>; // Display error message
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {dummyCauseData.map((cause) => (
+      {waqfs.map((waqf) => (
         <CauseCard
-          key={cause.id}
-          id={cause.id}
-          imageUri={cause.imageUri}
-          name={cause.name}
-          phoneNumber={cause.phoneNumber}
-          address={cause.address}
-          cause={cause.cause}
+          key={waqf.id}
+          id={waqf.id}
+          imageUrl={waqf.imageUrl}
+          waqfName={waqf.waqfName}
+          waqfPhoneNumber={waqf.waqfPhoneNumber}
+          waqfAddress={waqf.waqfAddress}
+          causes={waqf.causes} // Pass the causes to the CauseCard
         />
       ))}
     </div>
