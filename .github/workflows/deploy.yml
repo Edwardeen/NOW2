@@ -39,6 +39,6 @@ jobs:
         with:
           project: "edwardeen-now2-49"
           entrypoint: "jsr:@deno/nextjs-start"
-          root: "now2"
-          include: .next, public
+          root: "/now2"
+          
           
