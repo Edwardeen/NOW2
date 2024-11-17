@@ -1,7 +1,7 @@
 // pages/login.js
 "use client";
 import 'tailwindcss/tailwind.css';
-import LogoIMG from "../public/logo.png"; // Ensure you have a logo image in the public directory
+import LogoIMG from "@/public/logo.png"; // Ensure you have a logo image in the public directory
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 

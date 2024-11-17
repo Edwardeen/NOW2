@@ -1,92 +1,171 @@
 // components/TransactionCard.tsx
 import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 interface TransactionCardProps {
   id: string;
-  imageUri: string;
-  donatedWaqf: string;
-  status: string;
-  cause: string;
-  date: string;
-  currentStatus: string;
+  imageUrl: string;
+  waqfName: string; // Add waqfName
+  transactionDate: string; // Add transactionDate
+  transactionAmount: number; // Add transactionAmount
+  transactionStatus: string; // Add transactionStatus
+  additionalInfo?: string; // Optional field for any extra information
 }
 
-const TransactionCard: React.FC<TransactionCardProps> = ({ id, imageUri, donatedWaqf, status, cause, date, currentStatus }) => {
+const TransactionCard: React.FC<TransactionCardProps> = ({
+  id,
+  imageUrl,
+  waqfName,
+  transactionDate,
+  transactionAmount,
+  transactionStatus,
+  additionalInfo,
+}) => {
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    // Navigate to the transaction detail page with the transaction ID
+    router.push(`/User/transactions/${id}`); // Adjust the path according to your routing structure
+  };
+
   return (
-    <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green text-Tertiary mb-4 cursor-pointer max-w-[550px]">
+    <div
+      className="flex flex-col p-4 rounded-3xl bg-Green text-Tertiary mb-4 cursor-pointer max-w-[550px] h-96"
+      onClick={handleCardClick} // Add click handler
+    >
       <Image
         loading="lazy"
-        src={imageUri}
-        alt={`Image of ${donatedWaqf}`}
-        className="object-contain rounded-3xl aspect-[3.04] w-full"
-        width={600} // Adjust width as needed
-        height={200} // Adjust height as needed
+        src={imageUrl}
+        alt={`Image of ${waqfName}`}
+        className="object-cover h-1/3 rounded-3xl w-full"
+        width={600}
+        height={100}
       />
       <div className="flex flex-col px-4 mt-4">
         <div className="flex flex-wrap gap-10 justify-between items-center w-full text-3xl">
           <div className="self-stretch my-auto font-bold">
-            <span>{donatedWaqf}</span>
+            <span>{waqfName}</span>
           </div>
           <div className="self-stretch my-auto font-semibold">
-            <span>Status: {status}</span>
+            <span>Status: {transactionStatus}</span>
           </div>
         </div>
         <div className="mt-5">
-          <span>Cause: {cause}</span>
+          <span>Transaction Date: {transactionDate}</span>
         </div>
         <div className="mt-5">
-          <span>Date: {date}</span>
+          <span>Transaction Amount: RM{transactionAmount.toFixed(2)}</span>
         </div>
-        <div className="mt-5">
-          <span>Current Status: {currentStatus}</span>
-        </div>
-        <div className="flex justify-between mt-5">
-
-        </div>
+        {additionalInfo && (
+          <div className="mt-5">
+            <span>Additional Info: {additionalInfo}</span>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-// Dummy data creation for transaction cards
-const dummyTransactionData = [
-  {
-    id: '1',
-    imageUri: 'https://th.bing.com/th/id/OIP.ci1E7m8wCISyHZ6um8z01gHaDt?w=337&h=175&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    donatedWaqf: 'Waqf Project A',
-    status: 'Completed',
-    cause: 'Environmental Awareness',
-    date: '2023-10-01',
-    currentStatus: 'Funds Disbursed',
-  },
-  {
-    id: '2',
-    imageUri: 'https://th.bing.com/th/id/OIP.8AAZXg4tC_EX2Ol6Zk3jfQHaE5?w=302&h=200&c=7&r=0&o=5&dpr=1.4&pid=1.7',
-    donatedWaqf: 'Waqf Project B',
-    status: 'Pending',
-    cause: 'Waste Reduction',
-    date: '2023-10-02',
-    currentStatus: 'Awaiting Approval',
-  },
-  // Add more transaction items as needed
-];
+// components/Transactions.tsx
+import { useEffect, useState } from 'react';
 
-// Component to render all transaction cards
-const Transactions: React.FC = () => {
+interface TransactionsProps {
+  userId: string | null;
+  userType: string | null; // Accept userType as a prop
+}
+
+const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!userId) return;
+
+      try {
+        const response = await fetch(`/api/transactions/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch transactions');
+        }
+        const data = await response.json();
+        const enrichedTransactions = await Promise.all(data.map(async (transaction: { WaqfID: any; transactionDeposited: any; transactionScreened: any; totalScreened: any; transactionTransformed: any; transactionTransfered: any; transactionDate: any; transactionDescription: any; UserID: any; EntityID: any; LandfillsID: any; transactionAmount: any; }) => {
+          const waqf = await fetch(`/api/waqfs/${transaction.WaqfID}`); // Fetch Waqf details
+          const waqfData = await waqf.json();
+
+          // Determine transaction status
+          let transactionStatus = '';
+          if (transaction.transactionDeposited == true) {
+            transactionStatus = 'Awaiting Screening';
+            
+            if (transaction.transactionScreened == true) {
+                transactionStatus = `Screened for ${transaction.totalScreened}, awaiting Transformer`;
+                
+                if (transaction.transactionTransformed == true) {
+                    transactionStatus = 'Awaiting Transfer';
+
+                    if (transaction.transactionTransfered == true) {
+                        // Logic to send data to History table
+                        await fetch('/api/history', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            historyDate: transaction.transactionDate,
+                            historyDescription: transaction.transactionDescription,
+                            UserID: transaction.UserID,
+                            EntityID: transaction.EntityID,
+                            LandfillName: transaction .LandfillsID, // Assuming you have a way to get the landfill name
+                            WaqfName: waqfData.waqfName,
+                            totalTransferred: transaction.transactionAmount,
+                          }),
+                        });
+                        transactionStatus = 'Transferred';
+                      } 
+                  } 
+            } 
+          } else {
+            transactionStatus = 'Awaiting Deposit';
+          }
+
+          return {
+            ...transaction,
+            waqfName: waqfData.waqfName,
+            imageUrl: waqfData.imageUrl,
+            transactionStatus,
+          };
+        }));
+
+        setTransactions(enrichedTransactions);
+      } catch (error: any) {
+        console.error('Error fetching transactions:', error);
+        setError('Could not load transactions. Please try again later.');
+      }
+    };
+
+    fetchTransactions();
+  }, [userId]);
+
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
+
+  if (!transactions.length) {
+    return <div>No transactions found.</div>;
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {dummyTransactionData.map((transaction) => (
+      {transactions.map((transaction) => (
         <TransactionCard
           key={transaction.id}
           id={transaction.id}
-          imageUri={transaction.imageUri}
-          donatedWaqf={transaction.donatedWaqf}
-          status={transaction.status}
-          cause={transaction.cause}
-          date={transaction.date}
-          currentStatus={transaction.currentStatus}
+          imageUrl={transaction.imageUrl}
+          waqfName={transaction.waqfName}
+          transactionDate={new Date(transaction.transactionDate).toLocaleDateString()} // Format date
+          transactionAmount={transaction.transactionAmount}
+          transactionStatus={transaction.transactionStatus}
         />
       ))}
     </div>

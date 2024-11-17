@@ -55,7 +55,7 @@ const ChooseWaqf: React.FC = () => {
         </div>
         
         <div className="overflow-auto h-dvh w-full px-4">
-          <div className="flex flex-col gap-4 items-start"> {/* Adjusted to justify from the start */}
+          <div className="flex flex-col gap-4 items-center w-full"> {/* Adjusted to justify from the start */}
             <Waqf /> {/* Render the Waqf component */}
           </div>
         </div>
