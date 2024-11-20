@@ -11,7 +11,7 @@ export default NextAuth({
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         // Check if credentials are provided
         if (!credentials || !credentials.username || !credentials.password) {
           throw new Error('No credentials provided');
@@ -68,9 +68,9 @@ export default NextAuth({
         id: token.id as string, // Cast token.id to string
         name: session.user?.name || null, // Preserve the name if it exists
         type: token.type as string, // Preserve the type (user or entity)
+        frontName: session.user.frontName as string
       };
       return session;
     }
   }
 });
-``

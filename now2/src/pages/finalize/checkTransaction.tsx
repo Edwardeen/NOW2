@@ -118,7 +118,7 @@ const CheckTransaction: React.FC = () => {
       </div>
 
       <div className='flex flex-col mx-auto w-11/12 h-5/6 items-center gap-2 relative bg-Cream rounded-[20px] overflow-auto'>
-        <h2 className='text-2xl font-bold mb-4'>Review Your Transaction</h2>
+        <h2 className='text-4xl text-Tertiary font-bold mb-4 mt-20'>Review Your Transaction</h2>
         {landfill && waqf ? (
           <div className='flex flex-col w-full p-4'>
             <div className='mb-4'>

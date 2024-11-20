@@ -9,13 +9,17 @@ import Header from '@/app/components/header';
 import Transactions from '@/app/components/transactionCard';
 import History from '@/app/components/historyCard';
 import { useEffect, useState } from 'react';
+import { Graphcard } from "@/app/components/carbon_and_donation_chart";
+import { Session } from "inspector/promises";
 
 interface HomeProps {
   userId: string | null;
   userType: string | null;
+  name: string | null;
+  frontName: string | null;
 }
 
-export default function Home({ userId, userType }: HomeProps) {
+export default function Home({ userId, userType, name, frontName }: HomeProps) {
   const router = useRouter();
   const [totalDonations, setTotalDonations] = useState<number>(0);
   const [historyItems, setHistoryItems] = useState<any[]>([]); // State for history data
@@ -58,6 +62,7 @@ export default function Home({ userId, userType }: HomeProps) {
     fetchHistory();
   }, [userId]);
 
+
   if (!userId) {
     return <Login />;
   }
@@ -76,11 +81,12 @@ export default function Home({ userId, userType }: HomeProps) {
 
       <div className='flex flex-col mx-auto w-11/12 h-max mb-20 items-start gap-10 px-[83px] py-[42px] relative bg-Cream rounded-[20px]'>
         <div className='flex flex-col gap-5 items-center mx-auto'>
-          <span className='text-Tertiary font-bold'>Welcome User!</span>
+          <span className='text-Tertiary font-bold'>Welcome {name}!</span>
           <div className="flex flex-col gap-2 items-center">
-            <span className='text-Tertiary font-black'>Total Donations in November:</span>
+            <span className='text-Tertiary font-black'>Total Donations:</span>
             <span className="text-Primary font-black text-6xl"> RM {totalDonations.toFixed(2)}</span>
           </div>
+          <Graphcard />
         </div>
 
         <div className='flex flex-row gap-10 w-full items-center mx-auto'>
@@ -131,11 +137,15 @@ export async function getServerSideProps(context: GetSessionParams | undefined) 
   const session = await getSession(context);
   const userId = session?.user?.id || null;
   const userType = session?.user?.type || null;
+  const frontName = session?.user?.frontName || null;
+  const name = session?.user.name || null;
 
   return {
     props: {
       userId,
       userType,
+      frontName,
+      name
     },
   };
 }

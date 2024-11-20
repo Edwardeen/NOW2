@@ -49,7 +49,7 @@ const WaqfDetail: React.FC = () => {
 
   const handleSubmit = () => {
     if (waqf) {
-      localStorage.setItem('waqfId', waqf.id.toString());
+      localStorage.setItem('waqfId', String(waqf.id));
       router.push(`../finalize/checkTransaction`); // Change this to the desired route
     } else {
       alert('Waqf not found.'); // Optional: Alert the user if waqf is not found

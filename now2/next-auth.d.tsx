@@ -5,6 +5,8 @@ declare module 'next-auth' {
   interface User {
     id: string; // Add the id property
     type: string | null;
+    userName: string | null;
+    frontName: string | null;
   }
 
   interface Session {
