@@ -1,0 +1,180 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int            @id @default(autoincrement())
+  email        String
+  password     String
+  frontName    String?
+  familyName   String?
+  dateofbirth  DateTime?
+  icNumber     Int?
+  address      String?
+  phoneNumber  String?
+  username     String         @unique
+  zipCode      Int?
+  province     String?
+  city         String?
+  country      String?
+  Transactions Transactions[]
+  History      History[]
+}
+
+model Entity {
+  id                        Int       @id @default(autoincrement())
+  companyUsername           String    @unique
+  password                  String
+  picFrontName              String?
+  picFamilyName             String?
+  picPhoneNumber            String?
+  dateofbirth               DateTime?
+  companyName               String?
+  companyAddress            String?
+  companyPhoneNumber        String?
+  companyZipCode            Int?
+  companyEmail              String?
+  companyRegistrationNumber String?
+
+  History      History[]
+  Transactions Transactions[]
+}
+
+model Admin {
+  id       Int     @id @default(autoincrement())
+  username String? @unique
+  password String?
+  name     String
+}
+
+model Screener {
+  id           Int            @id @default(autoincrement())
+  username     String?        @unique
+  password     String?
+  name         String
+  email        String
+  phoneNumber  String
+  Landfills    Landfills[]
+  Transactions Transactions[]
+  History      History[]
+}
+
+model Transformer {
+  id           Int            @id @default(autoincrement())
+  username     String?        @unique
+  password     String?
+  name         String
+  email        String
+  phoneNumber  String
+  Landfills    Landfills[]
+  Transactions Transactions[]
+  History      History[]
+}
+
+model landfillArea {
+  id        Int         @id @default(autoincrement())
+  location  String      @unique
+  landfills Landfills[]
+}
+
+model Landfills {
+  id                  Int            @id @default(autoincrement())
+  landfillName        String         @unique
+  landfillAreaName    String
+  landfillAddress     String?
+  landfillPhoneNumber String?
+  landfillArea        landfillArea   @relation(fields: [landfillAreaName], references: [location])
+  imageUri            String?
+  TransformerID       Int?
+  ScreenerID          Int?
+  Transformer         Transformer?   @relation(fields: [TransformerID], references: [id])
+  Screener            Screener?      @relation(fields: [ScreenerID], references: [id])
+  Transactions        Transactions[]
+  History             History[]
+}
+
+model Waqf {
+  id              Int            @id @default(autoincrement())
+  totalRaised     Int?
+  bankNumber      Int?           @unique // Optional if not all Waqf have bank numbers
+  waqfName        String         @unique
+  waqfAddress     String?
+  waqfPhoneNumber String?
+  imageUrl        String?
+  description     String?
+  CauseOnWaqf     CauseOnWaqf[]
+  History         History[]
+  Transactions    Transactions[]
+}
+
+model WaqfCause {
+  id          Int           @id @default(autoincrement())
+  waqfCause   String        @unique
+  CauseOnWaqf CauseOnWaqf[]
+}
+
+model CauseOnWaqf {
+  waqfID      Int
+  waqfCauseID Int
+  waqfCause   WaqfCause @relation(fields: [waqfCauseID], references: [id])
+  Waqf        Waqf      @relation(fields: [waqfID], references: [id])
+
+  @@id([waqfID, waqfCauseID])
+}
+
+model Transactions {
+  id                     Int          @id @default(autoincrement())
+  transactionDate        DateTime
+  transactionAmount      Float
+  transactionType        String
+  transactionStatus      String
+  transactionDescription String?
+  transactionDeposited   Boolean      @default(false)
+  transactionScreened    Boolean      @default(false)
+  totalScreened          Int
+  transactionTransformed Boolean      @default(false)
+  transactionTransfered  Boolean      @default(false)
+  UserID                 Int?
+  User                   User?        @relation(fields: [UserID], references: [id])
+  EntityID               Int?
+  Entity                 Entity?      @relation(fields: [EntityID], references: [id])
+  WaqfID                 Int?
+  Waqf                   Waqf?        @relation(fields: [WaqfID], references: [id])
+  LandfillsID            Int?
+  Landfills              Landfills?   @relation(fields: [LandfillsID], references: [id])
+  ScreenerID             Int?
+  Screener               Screener?    @relation(fields: [ScreenerID], references: [id])
+  TransformerID          Int?
+  Transformer            Transformer? @relation(fields: [TransformerID], references: [id])
+}
+
+model History {
+  id                 Int          @id @default(autoincrement())
+  historyDate        DateTime
+  historyDescription String?
+  UserID             Int?
+  User               User?        @relation(fields: [UserID], references: [id])
+  EntityID           Int?
+  Entity             Entity?      @relation(fields: [EntityID], references: [id])
+  WaqfName           String
+  totalTransferred   Int
+  Waqf               Waqf         @relation(fields: [WaqfName], references: [waqfName])
+  LandfillName       String
+  Landfills          Landfills    @relation(fields: [LandfillName], references: [landfillName])
+  ScreenerID         Int?
+  Screener           Screener?    @relation(fields: [ScreenerID], references: [id])
+  TransformerID      Int?
+  Transformer        Transformer? @relation(fields: [TransformerID], references: [id])
+}

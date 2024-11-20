@@ -8,9 +8,9 @@ import Header from '@/app/components/header';
 
 const ChooseWaqf: React.FC = () => {
   const router = useRouter();
-  const { city } = router.query; // Get the city from the query parameters
+  const { landfillId } = router.query; // Get landfillId from query parameters
 
-  // State to hold the current landfill ID input
+  // State to hold the current waqfId input
   const [waqfId, setWaqfId] = useState<string>('');
 
   // Load previous IDs from session storage on component mount
@@ -25,14 +25,14 @@ const ChooseWaqf: React.FC = () => {
     setWaqfId(event.target.value);
   };
 
-  const handleSubmit = () => {
-    // Save the current ID to session storage
-    if (waqfId) {
-      const existingIds = sessionStorage.getItem('waqfIds');
-      const updatedIds = existingIds ? `${existingIds},${waqfId}` : waqfId;
-      sessionStorage.setItem('waqfIds', updatedIds);
-      // Optionally, clear the input after submission
-      setWaqfId('');
+  const handleWaqfClick = (waqfId: number) => {
+    const currentLandfillId = router.query.landfillId;
+
+    // Navigate to WaqfDetail page with waqfId and landfillId as query parameters
+    if (currentLandfillId) {
+      router.push(`/waqfs/${waqfId}?landfillId=${currentLandfillId}`);
+    } else {
+      alert('Landfill ID is missing.');
     }
   };
 
@@ -55,8 +55,11 @@ const ChooseWaqf: React.FC = () => {
         </div>
         
         <div className="overflow-auto h-dvh w-full px-4">
-          <div className="flex flex-col gap-4 items-center w-full"> {/* Adjusted to justify from the start */}
-            <Waqf /> {/* Render the Waqf component */}
+          <div className="flex flex-col gap-4 items-center w-full">
+            <div onClick={() => handleWaqfClick(Number(waqfId))} >
+              {/* Render the Waqf component with onClick handler to navigate */}
+              <Waqf />
+            </div>
           </div>
         </div>
       </div>

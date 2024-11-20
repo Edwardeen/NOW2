@@ -1,18 +1,33 @@
 // pages/api/waqfs/totalDonations.ts
-import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '@/lib/prisma'; // Adjust the path according to your project structure
+import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  try {
-    const totalDonations = await prisma.waqf.aggregate({
-      _sum: {
-        totalRaised: true, // Assuming 'totalRaised' is the column name
-      },
-    });
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Retrieve the session
+  const session = await getServerSession(req, res, authOptions);
 
-    res.status(200).json({ totalRaised: totalDonations._sum.totalRaised || 0 });
-  } catch (error) {
-    console.error('Error fetching total donations:', error);
-    res.status(500).json({ error: 'Failed to fetch total donations' });
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
-}
+
+  if (req.method === "GET") {
+    try {
+      const totalRaised = await prisma.waqf.aggregate({
+        _sum: {
+          totalRaised: true,
+        },
+      });
+
+      return res.status(200).json({ totalRaised: totalRaised._sum.totalRaised || 0 });
+    } catch (error) {
+      console.error("Error fetching total donations:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  } else {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+};
+
+export default handler;

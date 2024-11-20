@@ -2,46 +2,40 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 
 interface Waqf {
-  id: number; // Change to number if your ID is an integer
+  id: number ;
   imageUrl: string;
   waqfName: string;
   waqfPhoneNumber: string;
   waqfAddress: string;
-  causes: string; // Add causes as a string
+  causes: string;
 }
 
 const CauseCard: React.FC<Waqf> = ({ id, imageUrl, waqfName, waqfPhoneNumber, waqfAddress, causes }) => {
+  const router = useRouter();
+  const { landfillId } = router.query; // Get landfillId from the query parameters
+
   return (
-    <Link href={`/waqfs/${id}`}>
-      <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green/80 text-zinc-800 mb-4 cursor-pointer h-80 w-full">
-        <div className='flex h-1/3 w-full'>
-            <Image
-          loading="lazy"
-          src={imageUrl}
-          alt={`Image of ${waqfName}`}
-          className="object-cover rounded-3xl w-full h-72 overflow-hidden"
-          width={400}
-          height={200}
-        />
+    <Link href={`/waqfs/${id}?landfillId=${landfillId || ''}`}>
+      <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green/80 text-zinc-800 mb-4 cursor-pointer h-80 w-full hover:shadow-lg transition-shadow">
+        <div className="flex h-1/3 w-full">
+          <Image
+            loading="lazy"
+            src={imageUrl}
+            alt={`Image of ${waqfName}`}
+            className="object-cover rounded-3xl w-full h-72"
+            width={400}
+            height={200}
+          />
         </div>
-        
-        <div className="flex flex-col px-4 h-2/3 bg-gradient-to-b from-black/0 to-black/95 items-wrap rounded-3xl text-white">
-          <div className="flex flex-col gap-5 mb-2 justify-between my-auto items-center w-full text-3xl">
-            <div className="self-stretch text-4xl my-auto font-bold">
-              <span>{waqfName}</span>
-            </div>
-            <div className="self-stretch text-sm font-semibold">
-              <span>{waqfPhoneNumber}</span>
-            </div>
-          </div>
-          <div className="text-sm">
-            <span>{waqfAddress}</span>
-          </div>
-          <div className="font-semibold text-sm pb-3">
-            <span>Cause: {causes}</span> {/* Display the causes here */}
-          </div>
+
+        <div className="flex flex-col px-4 h-2/3 bg-gradient-to-b from-black/0 to-black/95 items-start rounded-3xl text-white">
+          <h2 className="text-4xl font-bold my-2">{waqfName}</h2>
+          <p className="text-sm font-semibold mb-1">{waqfPhoneNumber}</p>
+          <p className="text-sm mb-2">{waqfAddress}</p>
+          <p className="font-semibold text-sm">Cause: {causes}</p>
         </div>
       </div>
     </Link>
@@ -52,6 +46,7 @@ const CauseCard: React.FC<Waqf> = ({ id, imageUrl, waqfName, waqfPhoneNumber, wa
 const Causes: React.FC = () => {
   const [waqfs, setWaqfs] = useState<Waqf[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchWaqfs = async () => {
@@ -65,18 +60,28 @@ const Causes: React.FC = () => {
       } catch (error: any) {
         console.error('Error fetching waqfs:', error);
         setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchWaqfs();
   }, []);
 
+  if (loading) {
+    return <p className="text-center text-lg text-blue-500">Loading waqfs...</p>;
+  }
+
   if (error) {
-    return <p className="text-red-500">{error}</p>; // Display error message
+    return <p className="text-center text-red-500">{error}</p>;
+  }
+
+  if (waqfs.length === 0) {
+    return <p className="text-center text-gray-500">No waqfs available.</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
       {waqfs.map((waqf) => (
         <CauseCard
           key={waqf.id}
@@ -85,7 +90,7 @@ const Causes: React.FC = () => {
           waqfName={waqf.waqfName}
           waqfPhoneNumber={waqf.waqfPhoneNumber}
           waqfAddress={waqf.waqfAddress}
-          causes={waqf.causes} // Pass the causes to the CauseCard
+          causes={waqf.causes}
         />
       ))}
     </div>

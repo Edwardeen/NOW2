@@ -1,35 +1,28 @@
 // app/layout.tsx
-"use client";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
+import SessionProviderWrapper from "@/app/SessionProviderWrapper";
+import "./globals.css"; // Ensure global styles are imported
 
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import { SessionProvider } from 'next-auth/react';
-import "./globals.css";
+export const metadata = {
+  title: "NOW²",
+  description: "Recycle your waste and donate to Waqf houses.",
+};
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fetch the session server-side
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <SessionProvider>
+      <body>
+        <SessionProviderWrapper session={session}>
           {children}
-        </SessionProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

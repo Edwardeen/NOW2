@@ -1,45 +1,39 @@
-// pages/api/history/[id].ts
-import { NextApiRequest, NextApiResponse } from 'next';
-import prisma from '@/lib/prisma'; // Adjust the path according to your project structure
-import { getSession } from 'next-auth/react';
+// pages/api/history/[userId].ts
+import { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Get the session from the request
-  const session = await getSession({ req });
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Retrieve the session
+  const session = await getServerSession(req, res, authOptions);
 
-  // Check if the user is authenticated
   if (!session) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // Use the user ID and type from the session
-  const userId = Number(session.user.id); // Assuming user.id is a string
-  const userType = session.user.type; // Assuming user.type is either 'user' or 'entity'
+  const { userId } = req.query;
 
-  try {
-    let historyItems;
-    if (userType === 'user') {
-      // Fetch history where UserID matches the user's ID
-      historyItems = await prisma.history.findMany({
-        where: {
-          UserID: userId, // Use the user ID from the session
-        },
+  if (req.method === "GET") {
+    try {
+      // Ensure the user is requesting their own history
+      if (session.user.id !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      const history = await prisma.transactions.findMany({
+        where: { UserID: parseInt(userId as string) },
+        orderBy: { transactionDate: "desc" },
       });
-    } else if (userType === 'entity') {
-      // Fetch history where EntityID matches the user's ID
-      historyItems = await prisma.history.findMany({
-        where: {
-          EntityID: userId, // Use the entity ID from the session
-        },
-      });
-    } else {
-      throw new Error('Invalid user type');
+
+      return res.status(200).json(history);
+    } catch (error) {
+      console.error("Error fetching history:", error);
+      return res.status(500).json({ error: "Internal server error" });
     }
-
-    res.status(200).json(historyItems);
-  } catch (error) {
-    
-    console.error('Error fetching history:', error);
-    res.status(500).json({ error: 'Failed to fetch history' });
+  } else {
+    return res.status(405).json({ error: "Method not allowed" });
   }
-}
+};
+
+export default handler;

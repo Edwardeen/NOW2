@@ -1,4 +1,5 @@
 // pages/waqfs/[id].tsx
+"use client";
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import 'tailwindcss/tailwind.css';
@@ -11,22 +12,25 @@ interface Waqf {
   waqfName: string;
   waqfPhoneNumber: string;
   waqfAddress: string;
-  description?: string; // Add description if available
+  description?: string;
   imageUrl: string;
   totalRaised: number;
   CauseOnWaqf: {
     waqfCause: {
-      waqfCause: string; // Assuming this is the field name in WaqfCause
+      waqfCause: string;
     };
   }[];
 }
 
 const WaqfDetail: React.FC = () => {
   const router = useRouter();
-  const { id } = router.query; // Get the ID from the URL
+  const { id, landfillId } = router.query;
+
   const [waqf, setWaqf] = useState<Waqf | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+
+  
   useEffect(() => {
     const fetchWaqf = async () => {
       if (!id) return; // Ensure ID is available
@@ -47,14 +51,19 @@ const WaqfDetail: React.FC = () => {
     fetchWaqf();
   }, [id]);
 
+  if(waqf && landfillId){
+    const waqfId = waqf.id; 
+  }
+  
   const handleSubmit = () => {
-    if (waqf) {
-      localStorage.setItem('waqfId', waqf.id.toString());
-      router.push(`../finalize/checkTransaction`); // Change this to the desired route
+    if (waqf && landfillId) {
+      const waqfId = waqf.id;
+      router.push(`/finalize/checkTransaction?landfillId=${landfillId}&waqfId=${waqfId}`);
     } else {
-      alert('Waqf not found.'); // Optional: Alert the user if waqf is not found
+      alert("Waqf or landfill not found.");
     }
   };
+  
 
   if (error) {
     return <div className="text-red-500">{error}</div>; // Display error message
@@ -86,7 +95,7 @@ const WaqfDetail: React.FC = () => {
             <img 
               src={waqf.imageUrl} 
               alt="Description of the image" 
-              className='w-full h-full object-cover  rounded-2xl' 
+              className='w-full h-full object-cover rounded-2xl' 
             />
           </div>
 
@@ -98,10 +107,10 @@ const WaqfDetail: React.FC = () => {
                 <p className="mt-4 text-xl text-Tertiary">{waqf.description}</p>
                 <h1 className='mt-4 text-xl font-extrabold text-Tertiary'>Total Raised in Ringgit: {waqf.totalRaised}</h1>
                 <div className='mt-20'>
-                <p className="mt-2 text-xl text-Tertiary"><strong>Phone:</strong> {waqf.waqfPhoneNumber}</p>
-                <p className="mt-2 text-xl text-Tertiary"><strong>Address:</strong> {waqf.waqfAddress}</p>
-                <p className="mt-2 text-xl text-Tertiary"><strong>Cause:</strong> {waqf.CauseOnWaqf.map(cause => cause.waqfCause.waqfCause).join(', ')}</p> {/* Display causes */}
-              
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Phone:</strong> {waqf.waqfPhoneNumber}</p>
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Address:</strong> {waqf.waqfAddress}</p>
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Cause:</strong> {waqf.CauseOnWaqf.map(cause => cause.waqfCause.waqfCause).join(', ')}</p>
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Id:</strong> {waqf.id}</p>
                 </div>
               </div>
             </div>

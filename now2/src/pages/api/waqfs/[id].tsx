@@ -1,6 +1,7 @@
 // pages/api/waqfs/[id].ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma'; // Adjust the path according to your project structure
+import { getSession } from 'next-auth/react'; // Import getSession to handle session
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
@@ -13,10 +14,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Invalid ID' });
   }
 
+  // Get the session
+  const session = await getSession({ req });
+  if (!session) {
+    // If there's no session, return a 401 Unauthorized response
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
   try {
     const waqf = await prisma.waqf.findUnique({
       where: { id: Number(id) }, // Ensure the ID is a number
       select: {
+        id: true,
         waqfName: true, // Select the waqf name
         imageUrl: true, // Select the image URI
         waqfPhoneNumber: true,

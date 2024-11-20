@@ -92,7 +92,7 @@ const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
         const enrichedTransactions = await Promise.all(data.map(async (transaction: { WaqfID: any; transactionDeposited: any; transactionScreened: any; totalScreened: any; transactionTransformed: any; transactionTransfered: any; transactionDate: any; transactionDescription: any; UserID: any; EntityID: any; LandfillsID: any; transactionAmount: any; }) => {
           const waqf = await fetch(`/api/waqfs/${transaction.WaqfID}`); // Fetch Waqf details
           const waqfData = await waqf.json();
-
+          console.log('User ID', {userId})
           // Determine transaction status
           let transactionStatus = '';
           if (transaction.transactionDeposited == true) {

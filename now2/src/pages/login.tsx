@@ -123,13 +123,13 @@ export default function Page() {
                     alt="Screenshot"
                     src={LogoIMG.src}
                   />
-                  <p className="relative w-[328px] [ font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-[32px] text-center tracking-[0] leading-[normal]">
+                  <p className="relative w-[328px] [ font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-2xl text-center tracking-[0] leading-[normal]">
                     <span className="font-medium">Welcome to </span>
                     <span className="[font-family:'Noto_Sans-Bold',Helvetica] font-bold">NOW²</span>
                     <span className="font-medium">!</span>
                   </p>
                   <div className="relative w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-[25px] text-center tracking-[0] leading-[normal]">
-                    Be Wiser Be Greener
+                    Be Wiser Be Greener 
                   </div>
                   <div className="flex w-[148px] items-center justify-center gap-2.5 px-0 py-[27px] relative flex-[0_0_auto] mb-[-65.00px]">
                     <div className="relative flex-1 mt-8 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-xl text-center tracking-[0] leading-[normal]">

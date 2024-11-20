@@ -34,13 +34,13 @@ const LandfillDetail: React.FC = () => {
 
   const handleSubmit = () => {
     if (landfill) {
-      // Store landfill ID in local storage and navigate to the next page
-      localStorage.setItem('landfillId', landfill.id);
-      router.push(`../waqfs/chooseWaqf/`);
+      const landfillId = landfill.id;
+      router.push(`/waqfs/chooseWaqf?landfillId=${landfillId}`);
     } else {
-      alert('Landfill not found.'); // Optional: Alert the user if landfill is not found
+      alert("Landfill not found.");
     }
   };
+  
 
   if (error) {
     return <div className="text-red-500">{error}</div>; // Handle error state
@@ -71,7 +71,7 @@ const LandfillDetail: React.FC = () => {
           {/* Left side for Google Map */}
           <div className='w-1/3 h-full mr-20 my-auto'>
             <div id="map" className='w-full h-full'>
-            <iframe 
+              <iframe 
                 src={landfill.imageUri} 
                 style={{ border: 0 }} 
                 allowFullScreen 
@@ -90,7 +90,6 @@ const LandfillDetail: React.FC = () => {
                 <h1 className="text-5xl font-bold text-Tertiary py-10">{landfill.landfillName}</h1>
                 <p className="mt-2 text-Tertiary"><strong>Phone:</strong> {landfill.landfillPhoneNumber}</p>
                 <p className="mt-2 text-Tertiary"><strong>Address:</strong> {landfill.landfillAddress}</p>
-                
               </div>
             </div>
             {/* Submission Button */}
@@ -104,7 +103,7 @@ const LandfillDetail: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div>  
     </div>
   );
 };
