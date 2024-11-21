@@ -8,31 +8,31 @@ import Header from '@/app/components/header';
 
 const ChooseWaqf: React.FC = () => {
   const router = useRouter();
-  const { city } = router.query; // Get the city from the query parameters
+  const { landfillId, city } = router.query; // Get the landfillId and city from the query parameters
 
-  // State to hold the current landfill ID input
   const [waqfId, setWaqfId] = useState<string>('');
 
-  // Load previous IDs from session storage on component mount
+  // State to hold the current landfillId if it's passed as a query parameter
+  const [currentLandfillId, setCurrentLandfillId] = useState<string | null>(null);
+
+  // When the router query changes, update the landfillId state
   useEffect(() => {
-    const storedIds = sessionStorage.getItem('landfillIds');
-    if (storedIds) {
-      setWaqfId(storedIds); // Load existing IDs if any
+    if (landfillId) {
+      setCurrentLandfillId(landfillId as string); // Cast to string
     }
-  }, []);
+  }, [landfillId]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setWaqfId(event.target.value);
   };
 
   const handleSubmit = () => {
-    // Save the current ID to session storage
+    // Save the current waqfId to session storage
     if (waqfId) {
       const existingIds = sessionStorage.getItem('waqfIds');
       const updatedIds = existingIds ? `${existingIds},${waqfId}` : waqfId;
       sessionStorage.setItem('waqfIds', updatedIds);
-      // Optionally, clear the input after submission
-      setWaqfId('');
+      setWaqfId(''); // Clear the input after submission
     }
   };
 
@@ -47,16 +47,18 @@ const ChooseWaqf: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      {/* Cream Container with overflow control */}
+
       <div id="CreamContainer" className='flex flex-col mx-auto w-11/12 h-5/6 items-center gap-2.5 px-[83px] py-[42px] relative bg-Cream rounded-[20px] justify-between overflow-auto'>
         <div id="pickAWaqf" className='flex flex-row justify-between w-full'>
           <h1 className="text-Tertiary font-extrabold text-3xl mb-10 mx-auto">Pick your Waqf</h1>
         </div>
-        
+
         <div className="overflow-auto h-dvh w-full px-4">
-          <div className="flex flex-col gap-4 items-center w-full"> {/* Adjusted to justify from the start */}
-            <Waqf /> {/* Render the Waqf component */}
+          <div className="flex flex-col gap-4 items-center w-full">
+            <Waqf  landfillId={currentLandfillId ?? ''} />
+            {currentLandfillId && (
+              <p className="text-Tertiary font-bold">Landfill ID: {currentLandfillId}</p>
+            )}
           </div>
         </div>
       </div>

@@ -35,8 +35,9 @@ const LandfillDetail: React.FC = () => {
   const handleSubmit = () => {
     if (landfill) {
       // Store landfill ID in local storage and navigate to the next page
-      localStorage.setItem('landfillId', landfill.id);
-      router.push(`../waqfs/chooseWaqf/`);
+      router.push({ pathname: '/waqfs/chooseWaqf',
+        query: { landfillId: landfill.id },
+      });
     } else {
       alert('Landfill not found.'); // Optional: Alert the user if landfill is not found
     }

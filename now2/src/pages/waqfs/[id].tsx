@@ -23,7 +23,7 @@ interface Waqf {
 
 const WaqfDetail: React.FC = () => {
   const router = useRouter();
-  const { id } = router.query; // Get the ID from the URL
+  const { id, landfillId } = router.query; // Get the ID from the URL
   const [waqf, setWaqf] = useState<Waqf | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,11 +48,14 @@ const WaqfDetail: React.FC = () => {
   }, [id]);
 
   const handleSubmit = () => {
-    if (waqf) {
-      localStorage.setItem('waqfId', String(waqf.id));
-      router.push(`../finalize/checkTransaction`); // Change this to the desired route
+    if (waqf && landfillId) {
+      localStorage.setItem('waqfId', String(waqf.id)); // Store waqfId in localStorage (optional)
+      router.push({
+        pathname: '/finalize/checkTransaction',
+        query: { landfillId: String(landfillId), waqfId: String(id) }, // Ensure both IDs are in string format
+      });
     } else {
-      alert('Waqf not found.'); // Optional: Alert the user if waqf is not found
+      alert('Waqf or Landfill ID not found.'); // Optional: Alert the user if waqf or landfillId is not found
     }
   };
 
@@ -98,10 +101,9 @@ const WaqfDetail: React.FC = () => {
                 <p className="mt-4 text-xl text-Tertiary">{waqf.description}</p>
                 <h1 className='mt-4 text-xl font-extrabold text-Tertiary'>Total Raised in Ringgit: {waqf.totalRaised}</h1>
                 <div className='mt-20'>
-                <p className="mt-2 text-xl text-Tertiary"><strong>Phone:</strong> {waqf.waqfPhoneNumber}</p>
-                <p className="mt-2 text-xl text-Tertiary"><strong>Address:</strong> {waqf.waqfAddress}</p>
-                <p className="mt-2 text-xl text-Tertiary"><strong>Cause:</strong> {waqf.CauseOnWaqf.map(cause => cause.waqfCause.waqfCause).join(', ')}</p> {/* Display causes */}
-              
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Phone:</strong> {waqf.waqfPhoneNumber}</p>
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Address:</strong> {waqf.waqfAddress}</p>
+                  <p className="mt-2 text-xl text-Tertiary"><strong>Cause:</strong> {waqf.CauseOnWaqf.map(cause => cause.waqfCause.waqfCause).join(', ')}</p>
                 </div>
               </div>
             </div>

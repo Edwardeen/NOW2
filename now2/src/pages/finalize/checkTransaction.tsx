@@ -1,107 +1,102 @@
-// pages/checkTransaction.tsx
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useRouter } from 'next/router';
 import 'tailwindcss/tailwind.css';
+
 import LogoIMG from "../../public/logo.png";
 import Image from 'next/image';
 import Header from '@/app/components/header';
 
-// Dummy data for landfills and waqfs
 const landfillData = [
-  {
-    id: '1',
-    name: 'Landfill no. 1',
-    phoneNumber: '036277-6611',
-    address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
-    description: 'Description for Landfill no. 1',
-    imageUri: 'https://example.com/image1.jpg',
-  },
-  {
-    id: '2',
-    name: 'Landfill no. 2',
-    phoneNumber: '036277-6622',
-    address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
-    description: 'Description for Landfill no. 2',
-    imageUri: 'https://example.com/image2.jpg',
-  },
-];
+    {
+      id: '1',
+      name: 'Landfill no. 1',
+      phoneNumber: '036277-6611',
+      address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
+      description: 'Description for Landfill no. 1',
+      imageUri: 'https://example.com/image1.jpg',
+    },
+    {
+      id: '2',
+      name: 'Landfill no. 2',
+      phoneNumber: '036277-6622',
+      address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
+      description: 'Description for Landfill no. 2',
+      imageUri: 'https://example.com/image2.jpg',
+    },
+  ];
+  
+  const waqfData = [
+    {
+      id: '8',
+      name: 'Waqf no. 1',
+      phoneNumber: '036277-7711',
+      address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
+      description: 'Description for Waqf no. 1',
+      imageUri: 'https://example.com/image1.jpg',
+    },
+    {
+      id: '2',
+      name: 'Waqf no. 2',
+      phoneNumber: '036277-7722',
+      address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
+      description: 'Description for Waqf no. 2',
+      imageUri: 'https://example.com/image2.jpg',
+    },
+  ];
+  
 
-const waqfData = [
-  {
-    id: '1',
-    name: 'Waqf no. 1',
-    phoneNumber: '036277-7711',
-    address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
-    description: 'Description for Waqf no. 1',
-    imageUri: 'https://example.com/image1.jpg',
-  },
-  {
-    id: '2',
-    name: 'Waqf no. 2',
-    phoneNumber: '036277-7722',
-    address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
-    description: 'Description for Waqf no. 2',
-    imageUri: 'https://example.com/image2.jpg',
-  },
-];
+export default function CheckTransaction() {
+    const router = useRouter();
+    const { landfillId, waqfId } = router.query;
 
-const CheckTransaction: React.FC = () => {
-  const router = useRouter();
-  const [landfill, setLandfill] = useState<any>(null);
-  const [waqf, setWaqf] = useState<any>(null);
-  const [transactionId, setTransactionId] = useState<string | null>(null);
+    const [landfill, setLandfill] = useState<any>(null);
+    const [waqf, setWaqf] = useState<any>(null);
 
-  useEffect(() => {
-    // Retrieve IDs from local storage
-    const landfillId = localStorage.getItem('landfillId');
-    const waqfId = localStorage.getItem('waqfId');
+    useEffect(() => {
+        if (router.isReady) {
+          console.log('landfillId:', landfillId);
+          console.log('waqfId:', waqfId);
+    
+          // Find the corresponding landfill and waqf data
+          if (landfillId) {
+            const selectedLandfill = landfillData.find(lf => lf.id === landfillId);
+            setLandfill(selectedLandfill);
+          }
+          if (waqfId) {
+            const selectedWaqf = waqfData.find(wf => wf.id === waqfId);
+            setWaqf(selectedWaqf);
+          }
+        }
+      }, [router.isReady, landfillId, waqfId]); // Effect runs when router is ready and query params change
 
-    // Find the corresponding landfill and waqf data
-    if (landfillId) {
-      const selectedLandfill = landfillData.find(lf => lf.id === landfillId);
-      setLandfill(selectedLandfill);
-    }
-    if (waqfId) {
-      const selectedWaqf = waqfData.find(wf => wf.id === waqfId);
-      setWaqf(selectedWaqf);
-    }
-  }, []);
 
-  const handleSubmit = () => {
-    // Create a new transaction card
-    if (landfill && waqf) {
-      const newTransaction = {
-        landfillId: landfill.id,
-        waqfId: waqf.id,
-        transactionId: `TRANSACTION-${Date.now()}`, // Example transaction ID
+      const handleSubmit = () => {
+        if (landfill && waqf) {
+          const newTransaction = {
+            landfillId: landfill.id,
+            waqfId: waqf.id,
+            transactionId: `TRANSACTION-${Date.now()}`, // Example transaction ID
+          };
+    
+          console.log('New Transaction:', newTransaction);
+    
+          // Retrieve existing transactions from local storage
+          const existingTransactions = localStorage.getItem('transactions');
+          const transactionsArray = existingTransactions ? JSON.parse(existingTransactions) : [];
+    
+          transactionsArray.push(newTransaction);
+    
+          // Save the updated transactions back to local storage
+          localStorage.setItem('transactions', JSON.stringify(transactionsArray));
+    
+          alert('Transaction created successfully!');
+          localStorage.removeItem('landfillId');
+          localStorage.removeItem('waqfId');
+          router.push('/finalize/transactionSuccess');
+        }
       };
-  
-      // Log the new transaction for debugging
-      console.log('New Transaction:', newTransaction);
-  
-      // Retrieve existing transactions from local storage
-      const existingTransactions = localStorage.getItem('transactions');
-      const transactionsArray = existingTransactions ? JSON.parse(existingTransactions) : [];
-  
-      // Add the new transaction to the array
-      transactionsArray.push(newTransaction);
-  
-      // Save the updated transactions back to local storage
-      localStorage.setItem('transactions', JSON.stringify(transactionsArray));
-  
-      // Alert the user that the transaction was created successfully
-      alert('Transaction created successfully!');
-  
-      // Clear local storage items as needed
-      localStorage.removeItem('landfillId');
-      localStorage.removeItem('waqfId');
-  
-      // Redirect to home or another page
-      router.push('/finalize/transactionSuccess'); 
-    }
-  };
 
-  return (
+    return (
     <div className="flex flex-col justify-center h-screen bg-Green">
       <div className='mx-24'>
         <div className='flex flex-row justify-between items-center my-2'>
@@ -149,6 +144,4 @@ const CheckTransaction: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default CheckTransaction;
+    }
