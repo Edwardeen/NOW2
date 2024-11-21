@@ -25,52 +25,33 @@ const MyForm = () => {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent the default form submission
-
+    event.preventDefault();
+  
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Something went wrong');
-      }
-
-      const result = await response.json();
-      console.log(result.message); // Handle success (e.g., show a success message or redirect)
-
-      // Use NextAuth's signIn to create a session
-      const signInResult = await signIn('credentials', {
+      const result = await signIn('credentials', {
         redirect: false,
         username,
         password,
       });
-
-      if (signInResult?.error) {
-        throw new Error(signInResult.error);
+  
+      if (result?.error) {
+        throw new Error(result.error);
       }
-
-      // Redirect based on the type of user
-      if (result.type === 'user') {
-        router.push('/User/home');
-      } else if (result.type === 'entity') {
-        router.push('/User/home'); // Change this to the appropriate route for entities
-      }
-
-      // Reset the form fields if needed
+  
+      // Redirect based on user type (stored in token)
+      const response = await fetch('/api/auth/session');
+      const session = await response.json();
+  
+      
       setUsername('');
       setPassword('');
+
+      router.push('/User/home');
     } catch (error: any) {
-      console.error('Error:', error);
-      setError(error.message); // Set error message
+      setError(error.message);
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && <p className="text-red-500">{error}</p>} {/* Display error message */}

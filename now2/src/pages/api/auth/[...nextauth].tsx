@@ -12,44 +12,51 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // Check if credentials are provided
-        if (!credentials || !credentials.username || !credentials.password) {
+        if (!credentials?.username || !credentials?.password) {
           throw new Error('No credentials provided');
         }
-
-        // Check in User table
+      
+        // Helper function to validate user or entity
+        const validateCredentials = async (account: any, type: string) => {
+          if (account) {
+            const isValidPassword = await bcrypt.compare(credentials.password, account.password);
+            if (isValidPassword) {
+              return {
+                id: String(account.id),
+                name: type === 'user' ? account.username : account.companyUsername,
+                type,
+                userName: type === 'user' ? account.username : account.companyUsername,
+                frontName: type === 'user' ? account.frontName : account.picFrontName,
+              };
+            }
+          }
+          return null;
+        };
+      
+        // Check in the `User` table
         const user = await prisma.user.findUnique({
           where: { username: credentials.username },
         });
-
-        if (user) {
-          // Compare passwords for user
-          const isValidPassword = await bcrypt.compare(credentials.password, user.password);
-          if (isValidPassword) {
-            return { id: String(user.id), name: user.username, type: 'user' }; // Return user object
-          }
-        }
-
-        // Check in Entity table
+        console.log(user);
+        const validatedUser = await validateCredentials(user, 'user');
+        console.log(validatedUser);
+        if (validatedUser) return validatedUser;
+      
+        // Check in the `Entity` table
         const entity = await prisma.entity.findUnique({
           where: { companyUsername: credentials.username },
         });
-
-        if (entity) {
-          // Compare passwords for entity
-          const isValidPassword = await bcrypt.compare(credentials.password, entity.password);
-          if (isValidPassword) {
-            return { id: String(entity.id), name: entity.companyUsername, type: 'entity' }; // Return entity object
-          }
-        }
-
-        // If neither user nor entity found
+        const validatedEntity = await validateCredentials(entity, 'entity');
+        if (validatedEntity) return validatedEntity;
+      
+        // Throw error if no valid account is found
         throw new Error('Invalid username or password');
       }
-    })
+      
+    }),
   ],
   pages: {
-    signIn: '/login', // Redirect to your login page
+    signIn: '/login', // Redirect users to the login page
   },
   session: {
     strategy: 'jwt',
@@ -57,20 +64,24 @@ export default NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id; // Ensure this is a string
-        token.type = user.type; // Store the type (user or entity)
+        token.id = user.id;
+        token.type = user.type;
+        token.userName = user.userName; // Ensure userName is set in the token
+        token.frontName = user.frontName;
+        token.name = user.userName; // Use user.userName for name as well if it's consistent
+      
       }
       return token;
     },
     async session({ session, token }) {
-      // Ensure session.user is initialized
       session.user = {
-        id: token.id as string, // Cast token.id to string
-        name: session.user?.name || null, // Preserve the name if it exists
-        type: token.type as string, // Preserve the type (user or entity)
-        frontName: session.user.frontName as string
+        id: token.id as string,
+        type: token.type as string,
+        userName: token.userName as string, // Make sure userName is passed correctly from token
+        frontName: token.frontName as string,
+        name: token.userName as string,
       };
       return session;
-    }
-  }
+    },
+  },
 });
