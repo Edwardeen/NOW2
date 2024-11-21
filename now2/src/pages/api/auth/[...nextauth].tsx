@@ -11,7 +11,7 @@ export default NextAuth({
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials : any) {
         // Check if credentials are provided
         if (!credentials || !credentials.username || !credentials.password) {
           throw new Error('No credentials provided');
@@ -26,7 +26,7 @@ export default NextAuth({
           // Compare passwords for user
           const isValidPassword = await bcrypt.compare(credentials.password, user.password);
           if (isValidPassword) {
-            return { id: String(user.id), name: user.username, type: 'user' }; // Return user object
+            return { id: String(user.id), name: user.username, type: 'user', userName: user.username, frontName: user.frontName }; // Return user object
           }
         }
 
@@ -39,7 +39,7 @@ export default NextAuth({
           // Compare passwords for entity
           const isValidPassword = await bcrypt.compare(credentials.password, entity.password);
           if (isValidPassword) {
-            return { id: String(entity.id), name: entity.companyUsername, type: 'entity' }; // Return entity object
+            return { id: String(entity.id), name: entity.companyUsername, type: 'entity', userName: entity.companyUsername, frontName: entity.picFrontName }; // Return entity object
           }
         }
 
@@ -68,6 +68,7 @@ export default NextAuth({
         id: token.id as string, // Cast token.id to string
         name: session.user?.name || null, // Preserve the name if it exists
         type: token.type as string, // Preserve the type (user or entity)
+        userName: session.user?.userName || null, // Add the userName property
         frontName: session.user.frontName as string
       };
       return session;
