@@ -14,5 +14,8 @@ export async function middleware(req: NextRequest) {
 
 // Apply the middleware to specific routes
 export const config = {
-  matcher: ['/User/:path*'], // Protect all routes under /User   
+  matcher: ['/User/:path*'], // Protect all routes under /User  
+  api: {
+    bodyParser: true, // Ensures Next.js parses JSON
+  }, 
 };

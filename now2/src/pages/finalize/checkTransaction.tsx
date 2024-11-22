@@ -1,10 +1,28 @@
 import React, {useEffect, useState} from 'react';
 import { useRouter } from 'next/router';
 import 'tailwindcss/tailwind.css';
-
 import LogoIMG from "../../public/logo.png";
 import Image from 'next/image';
 import Header from '@/app/components/header';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectValue
+} from "@/components/ui/select"
+
+import { getSession, GetSessionParams } from "next-auth/react";
+
+interface CheckTransactionProps {
+  userId: string | null;
+  userType: string | null;
+  userName: string | null;
+  frontName: string | null;
+}
+
+
 
 const landfillData = [
     {
@@ -45,9 +63,12 @@ const landfillData = [
   ];
   
 
-export default function CheckTransaction() {
+export default function CheckTransaction({ userId, userType, userName, frontName }: CheckTransactionProps) {
     const router = useRouter();
     const { landfillId, waqfId } = router.query;
+
+    const [transactionType, setTransactionType] = useState('');
+    const [transactionDescription, setTransactionDescription] = useState('');
 
     const [landfill, setLandfill] = useState<any>(null);
     const [waqf, setWaqf] = useState<any>(null);
@@ -71,30 +92,46 @@ export default function CheckTransaction() {
 
 
       const handleSubmit = () => {
-        if (landfill && waqf) {
-          const newTransaction = {
-            landfillId: landfill.id,
-            waqfId: waqf.id,
-            transactionId: `TRANSACTION-${Date.now()}`, // Example transaction ID
-          };
-    
-          console.log('New Transaction:', newTransaction);
-    
-          // Retrieve existing transactions from local storage
-          const existingTransactions = localStorage.getItem('transactions');
-          const transactionsArray = existingTransactions ? JSON.parse(existingTransactions) : [];
-    
-          transactionsArray.push(newTransaction);
-    
-          // Save the updated transactions back to local storage
-          localStorage.setItem('transactions', JSON.stringify(transactionsArray));
-    
-          alert('Transaction created successfully!');
-          localStorage.removeItem('landfillId');
-          localStorage.removeItem('waqfId');
-          router.push('/finalize/transactionSuccess');
+
+        console.log('Transaction Type:', transactionType);
+        console.log('Description:', transactionDescription);
+        console.log('userId:', userId);
+        console.log('userType:', userType);
+
+        const data = {
+          transactionDate: new Date(),
+          transactionAmount: 1,
+          transactionType,
+          transactionDescription,
+          userId,
+          userType,
+          LandfillsID: landfillId,
+          WaqfID: waqfId,
+          totalScreened: 0,
         }
-      };
+
+
+        console.log("Payload sent to API:", data);
+
+
+        fetch('/api/finalize/transaction', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: 
+            JSON.stringify(data)
+        }).then((response) => {
+          if (response.ok) {
+            console.log('Transaction submitted successfully');
+            router.push('/finalize/transactionSuccess');
+          } else {
+            console.error('Failed to submit transaction');
+          }
+        });
+      }
+    
+      
 
     return (
     <div className="flex flex-col justify-center h-screen bg-Green">
@@ -115,17 +152,17 @@ export default function CheckTransaction() {
       <div className='flex flex-col mx-auto w-11/12 h-5/6 items-center gap-2 relative bg-Cream rounded-[20px] overflow-auto'>
         <h2 className='text-4xl text-Tertiary font-bold mb-4 mt-20'>Review Your Transaction</h2>
         {landfill && waqf ? (
-          <div className='flex flex-col w-full p-4'>
-            <div className='mb-4'>
-              <h3 className='text-xl font-semibold'>Selected Landfill</h3>
+          <div className='flex flex-col w-full p-4 grid grid-cols-2 text-black gap-20 px-20'>
+            <div className='bg-Green p-5 rounded-[3%] '>
+              <h3 className='text-xl font-bold justify-center text-center'>Selected Landfill</h3>
               <img src={landfill.imageUri} alt={landfill.name} className='w-full h-48 object-cover rounded-md' />
               <p><strong>Name:</strong> {landfill.name}</p>
               <p><strong>Phone:</strong> {landfill.phoneNumber}</p>
               <p><strong>Address:</strong> {landfill.address}</p>
               <p><strong>Description:</strong> {landfill.description}</p>
             </div>
-            <div>
-              <h3 className='text-xl font-semibold'>Selected Waqf</h3>
+            <div className='bg-Green p-5 rounded-[3%]'>
+              <h3 className='text-xl font-bold text-center'>Selected Waqf</h3>
               <img src={waqf.imageUri} alt={waqf.name} className='w-full h-48 object-cover rounded-md' />
               <p><strong>Name:</strong> {waqf.name}</p>
               <p><strong>Phone:</strong> {waqf.phoneNumber}</p>
@@ -136,12 +173,60 @@ export default function CheckTransaction() {
         ) : (
           <p className='text-red-500'>No landfill or waqf selected. Please go back and select one.</p>
         )}
+
+
+        {/* create form transaction_type : radio & transaction_desc : longtext */}
+        <Select onValueChange={setTransactionType}>
+          <SelectTrigger className="w-[180px] bg-white text-black">
+            <SelectValue placeholder="Transaction Type" />
+          </SelectTrigger>
+          <SelectContent className='bg-white text-black'>
+              <SelectItem value="Organic Waste">Organic Waste</SelectItem>
+              <SelectItem value="Recycleable Waste">Recycleable Waste</SelectItem>
+              <SelectItem value="Electronic Waste">Electronic Waste</SelectItem>
+              <SelectItem value="Hazardous Household Waste">Hazardous Household Waste</SelectItem>
+              <SelectItem value="Textile Waste">Text Wasteile</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <input
+          placeholder='Transaction Description'
+          className='w-1/2 h-48 p-2 bg-white text-black rounded-md' onChange={(e) => setTransactionDescription(e.target.value)}
+        ></input>
+
+        
+
+
+
+        
         <button 
           onClick={handleSubmit} 
-          className='mt-4 bg-Primary text-white font-bold py-2 px-4 rounded'>
+          className='mt-4 bg-Primary text-white font-bold py-2 px-4 rounded'
+          disabled= {!landfill || !waqf}>
           Submit Transaction
         </button>
       </div>
     </div>
   );
+}
+    
+
+    export async function getServerSideProps(context: GetSessionParams | undefined) {
+      const session = await getSession(context);
+      console.log('Session:', session);
+    
+      const userId = session?.user?.id || null;
+      const userType = session?.user?.type || null;
+      const frontName = session?.user?.frontName || null;
+      const userName = session?.user?.userName || null; // Ensure you access userName here
+    
+      return {
+        props: {
+          userId,
+          userType,
+          frontName,
+          userName, // Pass userName to the page
+        },
+      };
     }
+  
