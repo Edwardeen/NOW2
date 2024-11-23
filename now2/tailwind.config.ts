@@ -12,6 +12,8 @@ export default {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			red : '#9f1239',
+			orange : '#f59e0b',
   			Cream: '#DAD7CD',
   			Green: '#A3B18A',
   			Primary: '#588157',

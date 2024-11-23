@@ -47,10 +47,11 @@ export default async function POST(req : NextApiRequest, res : NextApiResponse) 
           transactionType: transactionType,
           transactionStatus: "pending",
           transactionDescription: transactionDescription,
-          totalScreened: 0,
+          totalScreened: 0,  // delete this line
           LandfillsID: parseInt(LandfillsID), // Ensure 1 exists in the Landfills table
           WaqfID: parseInt(WaqfID),      // Ensure 1 exists in the Waqf table
-          UserID: 2,      // Ensure 1 exists in the User table
+          UserID: (userType === "user") ? parseInt(userId) : null, // Ensure 1 exists in the User table
+          EntityID: (userType === "entity") ? parseInt(userId) : null, // Ensure 1 exists in the Entity table
         },
       });
       

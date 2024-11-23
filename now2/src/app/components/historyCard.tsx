@@ -1,7 +1,9 @@
-// app/components/HistoryCard.tsx
-import React from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/router';
+
+
+import React from "react";
+import Image from "next/image";
+import { jsPDF } from "jspdf";
+import axios from "axios"
 
 interface HistoryCardProps {
   id: string;
@@ -11,6 +13,8 @@ interface HistoryCardProps {
   totalTransferred: number;
   historyDescription: string;
   landfillName: string;
+  userId: string;
+  userType: string ;
 }
 
 const HistoryCard: React.FC<HistoryCardProps> = ({
@@ -21,12 +25,83 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
   totalTransferred,
   historyDescription,
   landfillName,
+  userId,
+  userType,
 }) => {
-  const router = useRouter();
 
-  const handleCardClick = () => {
-    router.push(`/User/history/${id}`);
+  const getUserData = async (id : number) => {
+    try {
+      const response = await axios.get(`/api/user/getUser/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  }
+
+  const getEntityData = async (id : number) => {
+    try {
+      const response = await axios.get(`/api/entity/getEntity/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching entity data:", error);
+      return null;
+    }
+  }
+
+  const handleCardClick = async () => {
+    const doc = new jsPDF();
+    let y = 20; // Initial Y-coordinate
+  
+    // Add content to the PDF
+    doc.setFontSize(20);
+    doc.text("History Details", 20, y);
+    y += 10; // Increment Y for the next line
+    doc.setFontSize(12);
+    doc.text(`Waqf Name: ${waqfName}`, 20, y);
+    y += 10;
+    doc.text(`Landfill Name: ${landfillName}`, 20, y);
+    y += 10;
+    doc.text(`Date: ${historyDate}`, 20, y);
+    y += 10;
+    doc.text(`Total Transferred: RM${totalTransferred.toFixed(2)}`, 20, y);
+    y += 10;
+    doc.text(`Description: ${historyDescription}`, 20, y);
+    y += 20; // Add extra space before user/entity data
+  
+    // Add user or entity data
+    if (userType === "user") {
+      const userData = await getUserData(parseInt(userId));
+      if (userData) {
+        doc.setFontSize(20);
+        doc.text("User Details:", 20, y);
+        doc.setFontSize(12);
+        y += 10;
+        delete userData.password; // Remove password from the data
+        for (const [key, value] of Object.entries(userData)) {
+          doc.text(`${key}: ${value}`, 20, y);
+          y += 10; // Increment Y for each data item
+        }
+      }
+    } else if (userType === "entity") {
+      const entityData = await getEntityData(parseInt(userId));
+      if (entityData) {
+        doc.setFontSize(20);
+        doc.text("Entity Details:", 20, y);
+        doc.setFontSize(12);
+        y += 10;
+        delete entityData.password; // Remove password from the data
+        for (const [key, value] of Object.entries(entityData)) {
+          doc.text(`${key}: ${value}`, 20, y);
+          y += 10; // Increment Y for each data item
+        }
+      }
+    }
+  
+    // Download the PDF
+    doc.save(`History_${id}.pdf`);
   };
+  
 
   return (
     <div
@@ -37,29 +112,27 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
         <div className="flex flex-col gap-5 justify-between items-center w-full text-3xl">
           <div className="self-stretch my-auto font-bold text-3xl">
             <span>{waqfName} </span>
-            
           </div>
-          
           <div className="self-stretch my-auto font-semibold text-3xl">
             <span>{landfillName}</span>
-          </div>     
-             
-        <div className="self-stretch my-auto font-semibold text-xl">
-          <span>History Date: {historyDate}</span>
+          </div>
+          <div className="self-stretch my-auto font-semibold text-xl">
+            <span>History Date: {historyDate}</span>
+          </div>
+          <div className="self-stretch my-auto font-semibold text-xl">
+            <span>Total Transferred: RM{totalTransferred.toFixed(2)}</span>
+          </div>
+          <div className="self-stretch my-auto font-semibold text-sm">
+            <span>Id: {id}</span>
+          </div>
         </div>
-        <div className="self-stretch my-auto font-semibold text-xl">
-          <span>Total Transferred: RM{totalTransferred.toFixed(2)}</span>
-        </div>
-        <div className="self-stretch my-auto font-semibold text-sm">
-        <span>Id: {id}</span>
-        </div >
-        
-        </div>
-
       </div>
     </div>
   );
 };
+
+
+
 
 // app/components/Histories.tsx
 import { useEffect, useState } from 'react';
@@ -89,6 +162,8 @@ const Histories: React.FC<HistoriesProps> = ({ userId, userType }) => {
   const [waqfDataMap, setWaqfDataMap] = useState<Record<string, WaqfData>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  console.log('userId:', userId);
+  console.log('userType:', userType);
 
   useEffect(() => {
     const fetchHistories = async () => {
@@ -171,16 +246,20 @@ const Histories: React.FC<HistoriesProps> = ({ userId, userType }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {histories.map((history) => (
-        <HistoryCard
-          key={history.id}
-          id={history.id}
-          imageUrl={history.imageUrl}
-          waqfName={history.waqfName}
-          historyDate={new Date(history.historyDate).toLocaleDateString()}
-          totalTransferred={history.totalTransferred}
-          historyDescription={history.historyDescription}
-          landfillName={history.landfillName}
-        />
+        userId && (
+          <HistoryCard
+            key={history.id}
+            id={history.id}
+            imageUrl={history.imageUrl}
+            waqfName={history.waqfName}
+            historyDate={new Date(history.historyDate).toLocaleDateString()}
+            totalTransferred={history.totalTransferred}
+            historyDescription={history.historyDescription}
+            landfillName={history.landfillName}
+            userId={userId}
+            userType={userType || ''}
+          />
+        )
       ))}
     </div>
   );

@@ -129,7 +129,7 @@ model CauseOnWaqf {
 model Transactions {
   id                     Int          @id @default(autoincrement())
   transactionDate        DateTime     @default(now())
-  transactionAmount      Float
+  transactionAmount      Float        @default(0)
   transactionType        String
   transactionStatus      String
   transactionDescription String?
@@ -139,7 +139,7 @@ model Transactions {
   transactionScreened    Boolean      @default(false)
   transactionTransfered  Boolean      @default(false)
   transactionTransformed Boolean      @default(false)
-  totalScreened          Int
+  totalScreened          Int          @default(0)
   LandfillsID            Int?
   WaqfID                 Int?
   ScreenerID             Int?
@@ -163,6 +163,7 @@ model History {
   totalTransferred   Int
   ScreenerID         Int?
   TransformerID      Int?
+  totalScreened      Int          @default(2)    //change this later (testing purposes)
   Entity             Entity?      @relation(fields: [EntityID], references: [id])
   Landfills          Landfills    @relation(fields: [LandfillName], references: [landfillName])
   Screener           Screener?    @relation(fields: [ScreenerID], references: [id])
