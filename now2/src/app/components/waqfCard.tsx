@@ -4,27 +4,34 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 interface Waqf {
-  id: number; // Change to number if your ID is an integer
+  id: number;
   imageUrl: string;
   waqfName: string;
   waqfPhoneNumber: string;
   waqfAddress: string;
-  causes: string; // Add causes as a string
+  causes: string;
 }
 
-const CauseCard: React.FC<Waqf> = ({ id, imageUrl, waqfName, waqfPhoneNumber, waqfAddress, causes }) => {
+interface CauseCardProps extends Waqf {
+  landfillId: string | null; // Add the landfillId prop
+}
+
+const CauseCard: React.FC<CauseCardProps> = ({ id, imageUrl, waqfName, waqfPhoneNumber, waqfAddress, causes, landfillId }) => {
+  // Use landfillId as needed in the card (for example, display or use it for making further requests)
+  console.log("Landfill ID passed to CauseCard:", landfillId); // Example use
+
   return (
-    <Link href={`/waqfs/${id}`}>
+    <Link href={`/waqfs/${id}?landfillId=${landfillId}`}>
       <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green/80 text-zinc-800 mb-4 cursor-pointer h-80 w-full">
         <div className='flex h-1/3 w-full'>
-            <Image
-          loading="lazy"
-          src={imageUrl}
-          alt={`Image of ${waqfName}`}
-          className="object-cover rounded-3xl w-full h-72 overflow-hidden"
-          width={400}
-          height={200}
-        />
+          <Image
+            loading="lazy"
+            src={imageUrl}
+            alt={`Image of ${waqfName}`}
+            className="object-cover rounded-3xl w-full h-72 overflow-hidden"
+            width={400}
+            height={200}
+          />
         </div>
         
         <div className="flex flex-col px-4 h-2/3 bg-gradient-to-b from-black/0 to-black/95 items-wrap rounded-3xl text-white">
@@ -40,7 +47,7 @@ const CauseCard: React.FC<Waqf> = ({ id, imageUrl, waqfName, waqfPhoneNumber, wa
             <span>{waqfAddress}</span>
           </div>
           <div className="font-semibold text-sm pb-3">
-            <span>Cause: {causes}</span> {/* Display the causes here */}
+            <span>Cause: {causes}</span>
           </div>
         </div>
       </div>
@@ -49,7 +56,7 @@ const CauseCard: React.FC<Waqf> = ({ id, imageUrl, waqfName, waqfPhoneNumber, wa
 };
 
 // Component to render all cause cards
-const Causes: React.FC = () => {
+const Causes: React.FC<{ landfillId: string }> = ({ landfillId }) => {  // Accept landfillId as a prop here
   const [waqfs, setWaqfs] = useState<Waqf[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,7 +79,7 @@ const Causes: React.FC = () => {
   }, []);
 
   if (error) {
-    return <p className="text-red-500">{error}</p>; // Display error message
+    return <p className="text-red-500">{error}</p>;
   }
 
   return (
@@ -85,7 +92,8 @@ const Causes: React.FC = () => {
           waqfName={waqf.waqfName}
           waqfPhoneNumber={waqf.waqfPhoneNumber}
           waqfAddress={waqf.waqfAddress}
-          causes={waqf.causes} // Pass the causes to the CauseCard
+          causes={waqf.causes}
+          landfillId={landfillId} // Pass landfillId to each CauseCard
         />
       ))}
     </div>

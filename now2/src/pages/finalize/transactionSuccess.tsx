@@ -11,7 +11,7 @@ const TransactionSuccess: React.FC = () => {
   
     const handleCheckStatus = () => {
       // Navigate to the status page or wherever you want to redirect the user
-      router.push('home'); // Change '/status' to your desired route
+      router.push('../User/home'); // Change '/status' to your desired route
     };
 
     return (
@@ -58,7 +58,7 @@ const TransactionSuccess: React.FC = () => {
                     onClick={handleCheckStatus}
                     className="gap-2.5 self-stretch px-8 py-5 mt-9 max-w-full mx-auto my-20 bg-zinc-800 min-h-[80px] w-[483px] max-md:px-5 max-md:max-w-full text-stone-300 font-bold"
                     >
-                    Check out your status here.
+                    Go back to Home.
                     </button>
                 </div>
             </div>

@@ -2,6 +2,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/lib/prisma'; // Adjust the path according to your project structure
 import { getSession } from 'next-auth/react';
+import { get } from 'http';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession({ req });

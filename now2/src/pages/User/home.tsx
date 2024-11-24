@@ -9,16 +9,57 @@ import Header from '@/app/components/header';
 import Transactions from '@/app/components/transactionCard';
 import History from '@/app/components/historyCard';
 import { useEffect, useState } from 'react';
+import { Graphcard } from "@/app/components/carbon_and_donation_chart";
+import axios from "axios";
+import { get } from "http";
 
 interface HomeProps {
   userId: string | null;
   userType: string | null;
+  userName: string | null;
+  frontName: string | null;
 }
 
-export default function Home({ userId, userType }: HomeProps) {
+export default function Home({ userId, userType, userName, frontName }: HomeProps) {
+  // print all of the user's data from the session
+  console.log(userId, userType, userName, frontName);   
   const router = useRouter();
   const [totalDonations, setTotalDonations] = useState<number>(0);
   const [historyItems, setHistoryItems] = useState<any[]>([]); // State for history data
+  const [totalScreened, setTotalScreened] = useState<number>(0);
+  console.log(userId, userType, userName, frontName);
+  
+  const getTotalScreened = async () => {
+    try {
+      const response = await axios.get(`/api/history/getTotals`);
+      setTotalScreened(response.data.totalScreened);
+
+    } catch (error) {
+      console.error('Error fetching history:', error);
+    }
+    return 0;
+  }
+
+  const getPercent = (totalScreened: number) => {
+    if (userType === 'user') {
+      return (totalScreened / 45) * 100;
+    } else if (userType === 'entity') {
+      return (totalScreened / 900) * 100;
+    }
+    return 0;
+  }
+
+  const getProgressColor = (progress: number) => {
+    if (progress < 33) {
+      return ' bg-red';
+    } else if (progress < 67 && progress >= 33) {
+      return ' bg-orange';
+    } else {
+      return ' bg-Primary';
+    }
+  }
+
+
 
   // Fetch total donations
   useEffect(() => {
@@ -36,6 +77,7 @@ export default function Home({ userId, userType }: HomeProps) {
     };
 
     fetchTotalDonations();
+    getTotalScreened();
   }, []);
 
   // Fetch history data
@@ -58,11 +100,13 @@ export default function Home({ userId, userType }: HomeProps) {
     fetchHistory();
   }, [userId]);
 
+
   if (!userId) {
     return <Login />;
   }
 
   return (
+    
     <div className="flex flex-col justify-center h-max bg-Green">
       <div className='mx-24'>
         <div className='flex flex-row justify-between items-center my-2'>
@@ -76,11 +120,27 @@ export default function Home({ userId, userType }: HomeProps) {
 
       <div className='flex flex-col mx-auto w-11/12 h-max mb-20 items-start gap-10 px-[83px] py-[42px] relative bg-Cream rounded-[20px]'>
         <div className='flex flex-col gap-5 items-center mx-auto'>
-          <span className='text-Tertiary font-bold'>Welcome User!</span>
+          <span className='text-Tertiary font-bold'>Welcome {userName}!</span>
           <div className="flex flex-col gap-2 items-center">
-            <span className='text-Tertiary font-black'>Total Donations in November:</span>
+            <span className='text-Tertiary font-black'>Total Donations:</span>
             <span className="text-Primary font-black text-6xl"> RM {totalDonations.toFixed(2)}</span>
           </div>
+          <div className="grid grid-cols-2 gap-3  justify-center align-center">
+            <Graphcard />
+            <div className="flex flex-col items-center justify-center  bg-Tertiary">
+              <h1 className="text-Green font-bold text-2xl text-center mb-2">
+                Your Progress : {totalScreened} / {userType === 'user' ? 45 : 900} Kg
+              </h1>
+              <div className="w-[80%] h-6 bg-Green rounded-full">
+                <div
+                  className={`h-6 rounded-full` + getProgressColor(getPercent(totalScreened))}
+                  style={{ width: `${getPercent(totalScreened)}%` }}
+                ></div>
+              </div>
+            </div>
+
+          </div>
+          
         </div>
 
         <div className='flex flex-row gap-10 w-full items-center mx-auto'>
@@ -129,13 +189,18 @@ export default function Home({ userId, userType }: HomeProps) {
 // Fetch user session on the server side
 export async function getServerSideProps(context: GetSessionParams | undefined) {
   const session = await getSession(context);
+
   const userId = session?.user?.id || null;
   const userType = session?.user?.type || null;
+  const frontName = session?.user?.frontName || null;
+  const userName = session?.user?.userName || null; // Ensure you access userName here
 
   return {
     props: {
       userId,
       userType,
+      frontName,
+      userName, // Pass userName to the page
     },
   };
 }
