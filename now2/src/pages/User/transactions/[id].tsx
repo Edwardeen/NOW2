@@ -215,19 +215,6 @@ const TransactionDetail: React.FC = () => {
                       <p><strong>Transaction Date:</strong> {new Date(transaction.transactionDate).toLocaleDateString()}</p>
                       <p><strong>Transaction Amount:</strong> RM{transaction.transactionAmount}</p>
                       
-                      <div>
-                        <h2>Screener Details</h2>
-                        <p><strong>Name:</strong> {screener?.name}</p>
-                        <p><strong>Email:</strong> {screener?.email}</p>
-                        <p><strong>Phone Number:</strong> {screener?.phoneNumber}</p>
-                      </div>
-                      <div>
-                        <h2>Transformer Details</h2>
-                        <p><strong>Name:</strong> {transformer?.name}</p>
-                        <p><strong>Email:</strong> {transformer?.email}</p>
-                        <p><strong>Phone Number:</strong> {transformer?.phoneNumber}</p>
-                      </div>
-                      
                       {/* Add more details as needed */}
                     </div>
                   </div>

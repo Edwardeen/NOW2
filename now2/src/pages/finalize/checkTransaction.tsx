@@ -24,46 +24,6 @@ interface CheckTransactionProps {
   userName: string | null;
   frontName: string | null;
 }
-
-
-
-const landfillData = [
-    {
-      id: '1',
-      name: 'Landfill no. 1',
-      phoneNumber: '036277-6611',
-      address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
-      description: 'Description for Landfill no. 1',
-      imageUri: 'https://example.com/image1.jpg',
-    },
-    {
-      id: '2',
-      name: 'Landfill no. 2',
-      phoneNumber: '036277-6622',
-      address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
-      description: 'Description for Landfill no. 2',
-      imageUri: 'https://example.com/image2.jpg',
-    },
-  ];
-  
-  const waqfData = [
-    {
-      id: '8',
-      name: 'Waqf no. 1',
-      phoneNumber: '036277-7711',
-      address: 'Address 1, Kuala Lumpur, Wilayah Persekutuan, 52100',
-      description: 'Description for Waqf no. 1',
-      imageUri: 'https://example.com/image1.jpg',
-    },
-    {
-      id: '2',
-      name: 'Waqf no. 2',
-      phoneNumber: '036277-7722',
-      address: 'Address 2, Kuala Lumpur, Wilayah Persekutuan, 52100',
-      description: 'Description for Waqf no. 2',
-      imageUri: 'https://example.com/image2.jpg',
-    },
-  ];
   
 
 export default function CheckTransaction({ userId, userType, userName, frontName }: CheckTransactionProps) {
@@ -96,7 +56,7 @@ export default function CheckTransaction({ userId, userType, userName, frontName
         phoneNumber : response.data.waqfPhoneNumber,
         address : response.data.waqfAddress,
         description : response.data.waqfDescription,
-        imageUri : response.data.imageUri
+        imageUrl : response.data.imageUrl
       }
     }
 
@@ -188,18 +148,18 @@ export default function CheckTransaction({ userId, userType, userName, frontName
       <div className='flex flex-col mx-auto w-11/12 h-5/6 items-center gap-2 relative bg-Cream rounded-[20px] overflow-auto'>
         <h2 className='text-4xl text-Tertiary font-bold mb-4 mt-20'>Review Your Transaction</h2>
         {landfill && waqf ? (
-          <div className='flex flex-col w-full p-4 grid grid-cols-2 text-black gap-20 px-20'>
-            <div className='bg-Green p-5 rounded-[3%] '>
+          <div className='flex flex-row w-full p-4  grid-cols-2 mx-auto items-center justify-center text-black gap-20 px-20'>
+            <div className='bg-Green text-Tertiary p-5 rounded-[3%] '>
               <h3 className='text-xl font-bold justify-center text-center'>Selected Landfill</h3>
-              <img src={landfill.imageUri} alt={landfill.name} className='w-full h-48 object-cover rounded-md' />
+              <iframe src={landfill.imageUri} className='w-full h-48 object-cover rounded-md' />
               <p><strong>Name:</strong> {landfill.name}</p>
               <p><strong>Phone:</strong> {landfill.phoneNumber}</p>
               <p><strong>Address:</strong> {landfill.address}</p>
               <p><strong>Description:</strong> {landfill.description}</p>
             </div>
-            <div className='bg-Green p-5 rounded-[3%]'>
-              <h3 className='text-xl font-bold text-center'>Selected Waqf</h3>
-              <img src={waqf.imageUri} alt={waqf.name} className='w-full h-48 object-cover rounded-md' />
+            <div className='bg-Green text-Tertiary p-5 rounded-[3%]'>
+              <h3 className='text-xl font-extrabold text-center'>Selected Waqf</h3>
+              <img src={waqf.imageUrl} alt={waqf.name} className='w-full h-48 object-cover rounded-md' />
               <p><strong>Name:</strong> {waqf.name}</p>
               <p><strong>Phone:</strong> {waqf.phoneNumber}</p>
               <p><strong>Address:</strong> {waqf.address}</p>
@@ -227,7 +187,7 @@ export default function CheckTransaction({ userId, userType, userName, frontName
 
         <input
           placeholder='Transaction Description'
-          className='w-1/2 h-48 p-2 bg-white text-black rounded-md' onChange={(e) => setTransactionDescription(e.target.value)}
+          className='w-1/2 h-48 p-2 bg-white text-black rounded-xl' onChange={(e) => setTransactionDescription(e.target.value)}
         ></input>
 
         
