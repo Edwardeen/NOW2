@@ -15,6 +15,9 @@ import {
 
 import { getSession, GetSessionParams } from "next-auth/react";
 
+import axios from 'axios';
+import { get } from 'http';
+
 interface CheckTransactionProps {
   userId: string | null;
   userType: string | null;
@@ -73,6 +76,30 @@ export default function CheckTransaction({ userId, userType, userName, frontName
     const [landfill, setLandfill] = useState<any>(null);
     const [waqf, setWaqf] = useState<any>(null);
 
+    const getLandfillData = async (id : number) => {
+      const response = await axios.get(`/api/landfills/${id}`);
+      return {
+        id : response.data.id,
+        name : response.data.landfillName,
+        phoneNumber : response.data.landfillPhoneNumber,
+        address : response.data.landfillAddress,
+        description : response.data.landfillDescription,
+        imageUri : response.data.imageUri
+      }
+    }
+
+    const getWaqfData = async (id : number) => {
+      const response = await axios.get(`/api/waqfs/${id}`);
+      return {
+        id : response.data.id,
+        name : response.data.waqfName,
+        phoneNumber : response.data.waqfPhoneNumber,
+        address : response.data.waqfAddress,
+        description : response.data.waqfDescription,
+        imageUri : response.data.imageUri
+      }
+    }
+
     useEffect(() => {
         if (router.isReady) {
           console.log('landfillId:', landfillId);
@@ -80,12 +107,21 @@ export default function CheckTransaction({ userId, userType, userName, frontName
     
           // Find the corresponding landfill and waqf data
           if (landfillId) {
-            const selectedLandfill = landfillData.find(lf => lf.id === landfillId);
-            setLandfill(selectedLandfill);
+            const selectedLandfill =  getLandfillData(parseInt(Array.isArray(landfillId) ? landfillId[0] : landfillId)).then((data) => {
+              setLandfill(data);
+              console.log('Landfill:', data);
+            }).catch((error) => {
+              console.error('Error fetching landfill:', error);
+            });
+            
           }
           if (waqfId) {
-            const selectedWaqf = waqfData.find(wf => wf.id === waqfId);
-            setWaqf(selectedWaqf);
+            const selectedWaqf = getWaqfData(parseInt(Array.isArray(waqfId) ? waqfId[0] : waqfId)).then((data) => {
+              setWaqf(data);
+              console.log('Waqf:', data);
+            }).catch((error) => {
+              console.error('Error fetching waqf:', error);
+            });
           }
         }
       }, [router.isReady, landfillId, waqfId]); // Effect runs when router is ready and query params change

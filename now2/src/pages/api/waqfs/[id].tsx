@@ -17,6 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const waqf = await prisma.waqf.findUnique({
       where: { id: Number(id) }, // Ensure the ID is a number
       select: {
+        id: true, // Select the waqf ID
         waqfName: true, // Select the waqf name
         imageUrl: true, // Select the image URI
         waqfPhoneNumber: true,
