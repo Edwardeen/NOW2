@@ -42,7 +42,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
 
   const getPercent = (totalScreened: number) => {
     if (userType === 'user') {
-      return (totalScreened / 45) * 100;
+      return (totalScreened / 35) * 100;
     } else if (userType === 'entity') {
       return (totalScreened / 900) * 100;
     }
@@ -59,6 +59,11 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
     }
   }
 
+  const getPercentage = (totalScreened: number) => {
+
+
+    return
+  }
 
 
   // Fetch total donations
@@ -131,12 +136,19 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
               <h1 className="text-Green font-bold text-2xl text-center mb-2">
                 Your Progress : {totalScreened} / {userType === 'user' ? 45 : 900} Kg
               </h1>
-              <div className="w-[80%] h-6 bg-Green rounded-full">
+              
+              <h1 className="text-Green font-bold text-2xl text-center mb-2">
+                Percentage: {Math.floor(getPercent(totalScreened))}%
+              </h1>
+              
+              
+              <div className="w-[80%] h-6 bg-Green rounded-full mt-5">
                 <div
                   className={`h-6 rounded-full` + getProgressColor(getPercent(totalScreened))}
                   style={{ width: `${getPercent(totalScreened)}%` }}
                 ></div>
               </div>
+              <div className="mt-20 text-center text-Cream/40">The formula to count<p className="font-extrabold">Emissions (kg CO₂)</p> = Activity Data × Emission Factor Emissions(kg CO₂) = Activity Data×Emission Factor</div>
             </div>
 
           </div>
