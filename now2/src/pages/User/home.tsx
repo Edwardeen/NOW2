@@ -42,7 +42,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
 
   const getPercent = (totalScreened: number) => {
     if (userType === 'user') {
-      return (totalScreened / 45) * 100;
+      return (totalScreened / 35) * 100;
     } else if (userType === 'entity') {
       return (totalScreened / 900) * 100;
     }
@@ -59,6 +59,11 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
     }
   }
 
+  const getPercentage = (totalScreened: number) => {
+
+
+    return
+  }
 
 
   // Fetch total donations
@@ -131,12 +136,19 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
               <h1 className="text-Green font-bold text-2xl text-center mb-2">
                 Your Progress : {totalScreened} / {userType === 'user' ? 45 : 900} Kg
               </h1>
-              <div className="w-[80%] h-6 bg-Green rounded-full">
+              
+              <h1 className="text-Green font-bold text-2xl text-center mb-2">
+                Percentage: {Math.floor(getPercent(totalScreened))}%
+              </h1>
+              
+              
+              <div className="w-[80%] h-6 bg-Green rounded-full mt-5">
                 <div
                   className={`h-6 rounded-full` + getProgressColor(getPercent(totalScreened))}
                   style={{ width: `${getPercent(totalScreened)}%` }}
                 ></div>
               </div>
+              <div className="mt-20 text-center text-Cream/40">The formula to count<p className="font-extrabold">Emissions (kg CO₂)</p> = Activity Data × Emission Factor Emissions(kg CO₂) = Activity Data×Emission Factor</div>
             </div>
 
           </div>
@@ -149,7 +161,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
               <div id="Image Picture" className='container w-1/4 h-full bg-Primary rounded-l-2xl'></div>
               <div className='flex flex-col gap-5 items-start m-8 ml-10 w-3/4'>
                 <span className='text-Tertiary font-bold text-4xl'>Start Donating your Trashes Now.</span>
-                <span className='text-Tertiary font-normal text-xl w-3/4'>
+                <span className='text-Tertiary font-normal text-xl w-3/4 text-ellipsis overflow-hidden'>
                   The more you donate trashes, the more money you can donate. From a simple household trash, converted into money to be sent to Waqf houses and used for numerous causes that will help everyone, from any kind, any age, and anyone.
                 </span>
               </div>

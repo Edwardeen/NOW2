@@ -306,7 +306,7 @@ export default function Page() {
     const router = useRouter();
     return (
         <div className="bg-Green w-screen flex items-center justify-center">
-            <div id="cardBg" className="flex flex-col items-center gap-2.5 w-1/2 my-20 bg-Cream rounded-[20px]">
+            <div id="cardBg" className="flex flex-col items-center gap-2.5 w-1/2 my-20 overflow-auto bg-Cream rounded-[20px]">
                 <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 flex-[0_0_auto]">
                     <div className="inline-flex flex-col items-center flex-[0_0_auto]">
                         <div className="inline-flex flex-col items-center gap-[70px] flex-[0_0_auto]">
