@@ -94,7 +94,7 @@ export default function Page() {
   const router = useRouter();
   return (
     <div className="bg-Green w-screen h-screen flex items-center justify-center">
-      <div id="cardBg" className="flex flex-col w-1/2 h-3/4 items-center gap-2.5 px-[83px] py-[42px] relative bg-Cream rounded-[20px] justify-between">
+      <div id="cardBg" className="flex flex-col w-1/2 h-3/4 items-center gap-2.5 px-[83px] py-[42px] relative overflow-auto bg-Cream rounded-[20px] justify-between">
         <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 relative flex-[0_0_auto] mb-[-180.00px]">
             <div className="inline-flex flex-col items-center relative flex-[0_0_auto]">
               <div className="inline-flex flex-col items-center gap-[70px] relative flex-[0_0_auto]">

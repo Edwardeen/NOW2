@@ -161,7 +161,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
               <div id="Image Picture" className='container w-1/4 h-full bg-Primary rounded-l-2xl'></div>
               <div className='flex flex-col gap-5 items-start m-8 ml-10 w-3/4'>
                 <span className='text-Tertiary font-bold text-4xl'>Start Donating your Trashes Now.</span>
-                <span className='text-Tertiary font-normal text-xl w-3/4'>
+                <span className='text-Tertiary font-normal text-xl w-3/4 text-ellipsis overflow-hidden'>
                   The more you donate trashes, the more money you can donate. From a simple household trash, converted into money to be sent to Waqf houses and used for numerous causes that will help everyone, from any kind, any age, and anyone.
                 </span>
               </div>
