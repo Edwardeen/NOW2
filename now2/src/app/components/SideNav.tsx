@@ -63,7 +63,7 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen, onClose }) => {
 
           <div className='flex flex-col justify-normal items-start mx-4 gap-4 mt-10'>
             <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Home</span>
-            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/landfills/landfills-chooseArea')}>Donate</span>
+            <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/landfills/chooseArea')}>Donate</span>
             <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Settings</span>
             <span className='btn btn-ghost text-Tertiary font-bold' onClick={() => router.push('/User/home')}>Credits</span>
           </div>

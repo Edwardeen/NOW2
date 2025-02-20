@@ -93,26 +93,26 @@ const MyForm = () => {
 export default function Page() {
   const router = useRouter();
   return (
-    <div className="bg-Green w-screen h-screen flex items-center justify-center">
-      <div id="cardBg" className="flex flex-col w-1/2 h-3/4 items-center gap-2.5 px-[83px] py-[42px] relative overflow-auto bg-Cream rounded-[20px] justify-between">
-        <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 relative flex-[0_0_auto] mb-[-180.00px]">
+    <div className="bg-Green lg:p-20 flex items-center justify-center lg:bg-Green backdrop:bg-Green h-full">
+      <div id="cardBg" className="flex flex-col items-center gap-2.5 bg-Cream rounded-[20px] justify-between sm:w-3/4 sm:h-full md:w-3/4 lg:w-1/2 lg:h-3/4 md:h-full lg:my-20">
+        <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 relative">
             <div className="inline-flex flex-col items-center relative flex-[0_0_auto]">
               <div className="inline-flex flex-col items-center gap-[70px] relative flex-[0_0_auto]">
                 <div className="inline-flex flex-col h-[249px] items-center gap-px relative">
                   <img
-                    className="relative w-[152px] h-[152px] object-cover"
+                    className="w-24 object-cover"
                     alt="Screenshot"
                     src={LogoIMG.src}
                   />
-                  <p className="relative w-[328px] [ font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-[32px] text-center tracking-[0] leading-[normal]">
+                  <p className=" w-1/2 [ font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-[32px] text-center tracking-[0] leading-[normal]">
                     <span className="font-medium">Welcome to </span>
                     <span className="[font-family:'Noto_Sans-Bold',Helvetica] font-bold">NOW²</span>
                     <span className="font-medium">!</span>
                   </p>
-                  <div className="relative w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-[25px] text-center tracking-[0] leading-[normal]">
+                  <div className="w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-[25px] text-center tracking-[0] leading-[normal]">
                     Be Wiser Be Greener
                   </div>
-                  <div className="flex w-[148px] items-center justify-center gap-2.5 px-0 py-[27px] relative flex-[0_0_auto] mb-[-65.00px]">
+                  <div className="flex w-[148px] items-center justify-center gap-2.5 px-0 py-2 relative flex-[0_0_auto] mb-[-65.00px]">
                     <div className="relative flex-1 mt-8 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-xl text-center tracking-[0] leading-[normal]">
                       Sign-in
                     </div>
@@ -120,7 +120,7 @@ export default function Page() {
                 </div>
                 <MyForm />
               </div>
-              <div id="registerText" className="btn btn-ghost relative w-[346px] h-[21px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-xl text-center tracking-[0] leading-[normal] whitespace-nowrap m-20" onClick={() => router.push('/register')}>
+              <div id="registerText" className="btn btn-ghost relative w-fit h-[21px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-xl text-center tracking-[0] leading-[normal] whitespace-nowrap m-20" onClick={() => router.push('/register')}>
                 <span className="[font-family:'Noto_Sans-Medium',Helvetica] font-medium text-black text-xl tracking-[0]">
                   Haven’t got an account?{" "}
                 </span>
