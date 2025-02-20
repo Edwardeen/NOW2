@@ -51,81 +51,139 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
 
   const handleCardClick = async () => {
     const doc = new jsPDF();
-    let y = 20; // Initial Y-coordinate
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+    let y = margin;
   
-    // Add content to the PDF
-    doc.setFontSize(20);
-    doc.text("History Details", 20, y);
-    y += 10; // Increment Y for the next line
+    // Header Section
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.text("RECEIPT", pageWidth / 2, y, { align: "center" });
+    y += 15;
+  
+    // Receipt Info
     doc.setFontSize(12);
-    doc.text(`Waqf Name: ${waqfName}`, 20, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Receipt No: HIST-${id}`, pageWidth - margin, y, { align: "right" });
     y += 10;
-    doc.text(`Landfill Name: ${landfillName}`, 20, y);
-    y += 10;
-    doc.text(`Date: ${historyDate}`, 20, y);
-    y += 10;
-    doc.text(`Total Transferred: RM${totalTransferred.toFixed(2)}`, 20, y);
-    y += 10;
-    doc.text(`Description: ${historyDescription}`, 20, y);
-    y += 20; // Add extra space before user/entity data
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, pageWidth - margin, y, { align: "right" });
+    y += 15;
   
-    // Add user or entity data
-    if (userType === "user") {
-      const userData = await getUserData(parseInt(userId));
-      if (userData) {
-        doc.setFontSize(20);
-        doc.text("User Details:", 20, y);
-        doc.setFontSize(12);
-        y += 10;
-        delete userData.password; // Remove password from the data
-        for (const [key, value] of Object.entries(userData)) {
-          doc.text(`${key}: ${value}`, 20, y);
-          y += 10; // Increment Y for each data item
-        }
-      }
-    } else if (userType === "entity") {
-      const entityData = await getEntityData(parseInt(userId));
-      if (entityData) {
-        doc.setFontSize(20);
-        doc.text("Entity Details:", 20, y);
-        doc.setFontSize(12);
-        y += 10;
-        delete entityData.password; // Remove password from the data
-        for (const [key, value] of Object.entries(entityData)) {
-          doc.text(`${key}: ${value}`, 20, y);
-          y += 10; // Increment Y for each data item
-        }
-      }
-    }
+    // Horizontal Line
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
   
-    // Download the PDF
-    doc.save(`History_${id}.pdf`);
+    // Transaction Details Section
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Transaction Details", margin, y);
+    y += 10;
+  
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    
+    // Create a two-column layout for transaction details
+    const leftColumnX = margin;
+    const rightColumnX = pageWidth / 2;
+    
+    doc.text("Waqf Name:", leftColumnX, y);
+    doc.text(waqfName, leftColumnX + 30, y);
+    
+    doc.text("Landfill Name:", rightColumnX, y);
+    doc.text(landfillName, rightColumnX + 30, y);
+    y += 10;
+  
+    doc.text("Transaction Date: ", leftColumnX, y);
+    doc.text(historyDate, leftColumnX + 30, y);
+    y += 15;
+  
+    // Amount Section
+    doc.setFont("helvetica", "bold");
+    doc.text("Amount Transferred:", leftColumnX, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(`RM ${totalTransferred.toFixed(2)}`, leftColumnX + 50, y);
+    y += 10;
+  
+    doc.text("Description:", leftColumnX, y);
+    doc.text(historyDescription, leftColumnX + 30, y, { maxWidth: pageWidth - (margin * 2) - 30 });
+    y += 15;
+  
+    // User/Entity Details Section
+if (userType === "user" || userType === "entity") {
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 10;
+
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${userType === "user" ? "User" : "Entity"} Details`, margin, y);
+  y += 10;
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "normal");
+
+  const details = userType === "user" 
+    ? await getUserData(parseInt(userId))
+    : await getEntityData(parseInt(userId));
+
+  if (details) {
+    delete details.password; // Remove sensitive information
+    delete details.id;
+
+    // Define the specific order of fields we want to display
+    const fieldOrder = [
+      { key: "frontName", label: "First Name" },
+      { key: "familyName", label: "Family Name" },
+      { key: "icNumber", label: "IC Number" },
+      { key: "dateOfBirth", label: "Date of Birth" },
+      { key: "phoneNumber", label: "Phone Number" },
+      { key: "email", label: "Email" },
+      { key: "address", label: "Address" },
+      { key: "city", label: "City" },
+      { key: "province", label: "Province" },
+      { key: "zipCode", label: "Zip Code" },
+      { key: "country", label: "Country" }
+    ];
+
+    // Display only the specified fields in the defined order
+    fieldOrder.forEach(({ key, label }) => {
+      if (details[key]) { // Only show if the field exists in the data
+        doc.text(`${label}:`, leftColumnX, y);
+        const value = details[key].toString(); // Ensure value is a string
+        doc.text(value, leftColumnX + 30, y, { maxWidth: pageWidth - (margin * 2) - 30 });
+        y += 7;
+      }
+    });
+  }
+}
+  
+    // Footer Section
+    y += 10;
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+    
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "italic");
+    doc.text("Thank you for your transaction", pageWidth / 2, y, { align: "center" });
+    
+    // Save the PDF
+    doc.save(`Receipt_HIST-${id}.pdf`);
   };
   
-
+  // JSX remains largely the same, but here's a cleaner version:
   return (
     <div
       className="flex flex-col p-4 rounded-3xl bg-Green text-Tertiary mb-4 cursor-pointer max-w-[550px] h-72"
       onClick={handleCardClick}
     >
-      <div className="flex flex-wrap px-4 mt-4">
-        <div className="flex flex-col gap-5 justify-between items-center w-full text-3xl">
-          <div className="self-stretch my-auto font-bold text-3xl">
-            <span>{waqfName} </span>
-          </div>
-          <div className="self-stretch my-auto font-semibold text-3xl">
-            <span>{landfillName}</span>
-          </div>
-          <div className="self-stretch my-auto font-semibold text-xl">
-            <span>History Date: {historyDate}</span>
-          </div>
-          <div className="self-stretch my-auto font-semibold text-xl">
-            <span>Total Transferred: RM{totalTransferred.toFixed(2)}</span>
-          </div>
-          <div className="self-stretch my-auto font-semibold text-sm">
-            <span>Id: {id}</span>
-          </div>
-        </div>
+      <div className="flex flex-col px-4 mt-4 gap-4">
+        <h2 className="font-bold text-3xl">{waqfName}</h2>
+        <h3 className="font-semibold text-2xl">{landfillName}</h3>
+        <p className="text-xl">Date: {historyDate}</p>
+        <p className="text-xl">Amount: RM{totalTransferred.toFixed(2)}</p>
+        <p className="text-sm">Receipt ID: {id}</p>
       </div>
     </div>
   );
