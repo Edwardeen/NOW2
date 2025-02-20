@@ -93,8 +93,8 @@ const MyForm = () => {
 export default function Page() {
   const router = useRouter();
   return (
-    <div className="bg-Green lg:p-20 flex items-center justify-center">
-      <div id="cardBg" className="flex flex-col items-center gap-2.5 bg-Cream rounded-[20px] justify-between sm:w-3/4 sm:h-full md:w-3/4 lg:w-1/2 lg:h-3/4 md:h-full">
+    <div className="bg-Green lg:p-20 flex items-center justify-center lg:bg-Green backdrop:bg-Green h-full">
+      <div id="cardBg" className="flex flex-col items-center gap-2.5 bg-Cream rounded-[20px] justify-between sm:w-3/4 sm:h-full md:w-3/4 lg:w-1/2 lg:h-3/4 md:h-full lg:my-20">
         <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 relative">
             <div className="inline-flex flex-col items-center relative flex-[0_0_auto]">
               <div className="inline-flex flex-col items-center gap-[70px] relative flex-[0_0_auto]">
