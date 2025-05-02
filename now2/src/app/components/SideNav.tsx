@@ -29,7 +29,7 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen, onClose }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, handleClickOutside]);
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/login' });

@@ -71,7 +71,7 @@ export default async function handler(
         monthlyData[key].carbon += record.totalScreened ?? 0; 
 
       } catch (dateError) {
-          console.error('Error processing date for record: ' + (record.id || 'N/A'), dateError);
+          console.error('Error processing date for record: ', dateError);
           // Decide if you want to skip the record or handle differently
       }
     });
