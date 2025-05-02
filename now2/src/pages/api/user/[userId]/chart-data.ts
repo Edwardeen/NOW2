@@ -53,7 +53,7 @@ export default async function handler(
         const date = new Date(record.historyDate);
         // Check if date is valid
         if (isNaN(date.getTime())) {
-          console.warn(`Invalid date found in history record ID (if available): ${record.id || 'N/A'}`);
+          console.warn(`Invalid date found in user history processing.`);
           return; // Skip this record
         }
         
