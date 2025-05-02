@@ -35,7 +35,7 @@ export default async function handler(
       try {
         const date = new Date(record.historyDate);
         if (isNaN(date.getTime())) {
-          // console.warn(`Invalid date found in global history processing.`); // Optional warning
+          console.warn(`Invalid date found in global history processing.`);
           return; // Skip this record
         }
         
