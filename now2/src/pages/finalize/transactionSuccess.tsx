@@ -15,54 +15,52 @@ const TransactionSuccess: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col justify-center h-screen bg-Green">
-            <div className='mx-24'>
-                <div className='flex flex-row justify-between items-center my-2'>
+        <div className="flex flex-col min-h-screen bg-Green p-4 sm:p-6 lg:p-8">
+            <div className='w-full max-w-7xl mx-auto'>
+                <div className='flex flex-row justify-between items-center py-2'>
                     <Header />
-                    <div className='flex flex-row gap-2'>
-                        <span className='flex flex-col my-auto text-Tertiary font-extrabold text-4xl'>NOW²</span>
+                    <div className='flex flex-row gap-2 items-center'>
+                        <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>NOW²</span>
                         <Image
-                        src={LogoIMG}
-                        alt="Logo"
-                        height={100}
-                        width={100}/>
-                        
+                            src={LogoIMG}
+                            alt="Logo"
+                            height={80} width={80}
+                            className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20"
+                        />
                     </div>
-                    
-                </div>
-            
-            </div>
-            
-            {/*The one below this is for the contents of the body (Cream Box)*/}
-            <div className='flex flex-col mx-auto w-11/12 h-5/6 items-center gap-2.5 px-[83px] py-[42px] relative bg-Cream text-Tertiary rounded-[20px] justify-between'>
-                <div className="flex flex-col items-center w-full max-md:max-w-full">
-                    <div>
-                    <h1>Transaction Appended!</h1>
-                    </div>
-                    <Image
-                    loading="lazy"
-                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/badd950f0b38d888beb06387891081cf3bb483721d6906e8b3df9c80e21cf299?placeholderIfAbsent=true&apiKey=ca09dd87004c45a6bc6f8569245d5eaa"
-                    alt="Transaction Success"
-                    className="object-contain mt-9 max-w-full aspect-[0.87] w-[260px]"
-                    width={260} // Set width for Next.js Image component
-                    height={300} // Set height for Next.js Image component
-                    />
-                    <div className="mt-9 text-center w-[662px] max-md:max-w-full">
-                    <p>
-                        Please proceed to submit your trash to the chosen area.
-                    </p>
-                    </div>
-                    
-                    
-                    <button
-                    onClick={handleCheckStatus}
-                    className="gap-2.5 self-stretch px-8 py-5 mt-9 max-w-full mx-auto my-20 bg-zinc-800 min-h-[80px] w-[483px] max-md:px-5 max-md:max-w-full text-stone-300 font-bold"
-                    >
-                    Go back to Home.
-                    </button>
                 </div>
             </div>
 
+            <div className='flex flex-col flex-grow mx-auto w-full max-w-4xl items-center justify-center gap-4 md:gap-6 px-4 py-6 sm:p-8 md:p-10 lg:p-12 my-4 md:my-6 relative bg-Cream text-Tertiary rounded-lg md:rounded-xl lg:rounded-2xl'>
+                <div className="flex flex-col items-center text-center w-full">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6">Transaction Appended!</h1>
+
+                    <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 my-6 md:my-8">
+                        <Image
+                            loading="lazy"
+                            src="https://cdn.builder.io/api/v1/image/assets/TEMP/badd950f0b38d888beb06387891081cf3bb483721d6906e8b3df9c80e21cf299?placeholderIfAbsent=true&apiKey=ca09dd87004c45a6bc6f8569245d5eaa"
+                            alt="Transaction Success Checkmark"
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
+                        />
+                    </div>
+                    
+                    <div className="max-w-lg mx-auto my-4 md:my-6">
+                        <p className="text-base sm:text-lg md:text-xl">
+                            Please proceed to submit your trash to the chosen landfill area.
+                            Your contribution is appreciated!
+                        </p>
+                    </div>
+
+                    <button
+                        onClick={handleCheckStatus}
+                        className="bg-Primary hover:bg-opacity-90 text-white font-bold py-3 px-8 sm:px-10 rounded-lg transition-colors mt-6 md:mt-8 text-base sm:text-lg"
+                    >
+                        Go back to Home
+                    </button>
+                </div>
+            </div>
         </div>
     )
 };

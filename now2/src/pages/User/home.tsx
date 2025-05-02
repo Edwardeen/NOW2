@@ -11,7 +11,11 @@ import History from '@/app/components/historyCard';
 import { useEffect, useState } from 'react';
 import { Graphcard } from "@/app/components/carbon_and_donation_chart";
 import axios from "axios";
-import { get } from "http";
+
+// Skeleton Loader Component (Simple Example)
+const SkeletonLoader = ({ className = '' }: { className?: string }) => (
+  <div className={`animate-pulse bg-gray-300 rounded ${className}`}></div>
+);
 
 interface HomeProps {
   userId: string | null;
@@ -21,84 +25,102 @@ interface HomeProps {
 }
 
 export default function Home({ userId, userType, userName, frontName }: HomeProps) {
-  // print all of the user's data from the session
-  console.log(userId, userType, userName, frontName);   
   const router = useRouter();
   const [totalDonations, setTotalDonations] = useState<number>(0);
-  const [historyItems, setHistoryItems] = useState<any[]>([]); // State for history data
-  const [totalScreened, setTotalScreened] = useState<number>(0);
-  console.log(userId, userType, userName, frontName);
-  
-  const getTotalScreened = async () => {
-    try {
-      const response = await axios.get(`/api/history/getTotals`);
-      setTotalScreened(response.data.totalScreened);
+  const [isLoadingDonations, setIsLoadingDonations] = useState(true);
+  const [donationError, setDonationError] = useState<string | null>(null);
 
-    } catch (error) {
-      console.error('Error fetching history:', error);
-    }
-    return 0;
-  }
+  const [totalScreened, setTotalScreened] = useState<number>(0);
+  const [isLoadingScreened, setIsLoadingScreened] = useState(true);
+  const [screenedError, setScreenedError] = useState<string | null>(null);
+
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   const getPercent = (totalScreened: number) => {
-    if (userType === 'user') {
-      return (totalScreened / 35) * 100;
-    } else if (userType === 'entity') {
-      return (totalScreened / 900) * 100;
-    }
-    return 0;
+    const target = userType === 'user' ? 45 : 900; // Corrected user target
+    const percentage = (totalScreened / target) * 100;
+    return Math.min(Math.max(percentage, 0), 100); // Clamp between 0 and 100
   }
 
   const getProgressColor = (progress: number) => {
     if (progress < 33) {
-      return ' bg-red';
-    } else if (progress < 67 && progress >= 33) {
-      return ' bg-orange';
+      return 'bg-red-500'; // Use actual color name if defined in tailwind config, else standard Tailwind color
+    } else if (progress < 67) {
+      return 'bg-orange-500'; // Use actual color name if defined in tailwind config
     } else {
-      return ' bg-Primary';
+      return 'bg-Primary'; // Assuming Primary is defined in tailwind config
     }
   }
-
-  const getPercentage = (totalScreened: number) => {
-
-
-    return
-  }
-
 
   // Fetch total donations
   useEffect(() => {
     const fetchTotalDonations = async () => {
+      setIsLoadingDonations(true);
+      setDonationError(null);
       try {
-        const response = await fetch('/api/waqfs/totalDonations');
+        const response = await fetch('/api/global-total-donations');
         if (!response.ok) {
-          throw new Error('Failed to fetch total donations');
+          throw new Error('Failed to fetch global total donations');
         }
         const data = await response.json();
-        setTotalDonations(data.totalRaised);
-      } catch (error) {
-        console.error('Error fetching total donations:', error);
+        setTotalDonations(data.totalDonations || 0);
+      } catch (error: any) {
+        console.error('Error fetching global total donations:', error);
+        setDonationError(error.message || 'Could not load donations.');
+      } finally {
+        setIsLoadingDonations(false);
       }
     };
-
     fetchTotalDonations();
-    getTotalScreened();
   }, []);
+
+  // Fetch total screened (User Specific)
+  useEffect(() => {
+    const fetchTotalScreened = async () => {
+      if (!userId) { // Don't fetch if userId is not available
+        setIsLoadingScreened(false);
+        return;
+      }
+      setIsLoadingScreened(true);
+      setScreenedError(null);
+      try {
+        // Fetch from the new user-specific endpoint
+        const response = await axios.get(`/api/user/${userId}/screened-total`); 
+        setTotalScreened(response.data.totalScreened || 0);
+      } catch (error: any) {
+        console.error('Error fetching screened total:', error);
+        setScreenedError(error.message || 'Could not load progress.');
+      } finally {
+        setIsLoadingScreened(false);
+      }
+    }
+    fetchTotalScreened();
+  }, [userId]);
 
   // Fetch history data
   useEffect(() => {
     const fetchHistory = async () => {
-      if (!userId) return;
-
+      if (!userId) {
+        setIsLoadingHistory(false);
+        return; // No user ID, nothing to fetch
+      }
+      setIsLoadingHistory(true);
+      setHistoryError(null);
       try {
         const response = await fetch(`/api/history/${userId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch history');
+          const errorData = await response.json().catch(() => ({})); // Try to parse error, default to empty object
+          throw new Error(errorData.error || 'Failed to fetch history');
         }
         const data = await response.json();
-        setHistoryItems(data); // Update history items state
-      } catch (error) {
+        setHistoryItems(data || []); // Update history items state, default to empty array
+      } catch (error: any) {
         console.error('Error fetching history:', error);
+        setHistoryError(error.message || 'Could not load history.');
+      } finally {
+        setIsLoadingHistory(false);
       }
     };
 
@@ -107,91 +129,150 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
 
 
   if (!userId) {
+    // If no userId, redirect to login or show login component
+    // Ensure Login component doesn't trigger loops if session isn't immediately available
     return <Login />;
   }
 
+  const currentProgressPercent = getPercent(totalScreened);
+  const progressColorClass = getProgressColor(currentProgressPercent);
+
   return (
-    
-    <div className="flex flex-col justify-center h-max bg-Green">
-      <div className='mx-24'>
-        <div className='flex flex-row justify-between items-center my-2'>
+    <div className="flex flex-col justify-center min-h-screen bg-Green">
+       {/* Responsive Header Area */}
+      <div className='px-4 sm:px-6 lg:px-8 xl:px-12'>
+        <div className='flex flex-row justify-between items-center py-2'>
           <Header />
-          <div className='flex flex-row gap-2'>
-            <span className='flex flex-col my-auto text-Tertiary font-extrabold text-4xl'>NOW²</span>
-            <Image src={LogoIMG} alt="Logo" height={100} width={100} />
+          <div className='flex flex-row gap-2 items-center'>
+             {/* Responsive Logo/Text */}
+            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>NOW²</span>
+            <Image src={LogoIMG} alt="Logo" height={80} width={80} className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20" />
           </div>
         </div>
       </div>
 
-      <div className='flex flex-col mx-auto w-11/12 h-max mb-20 items-start gap-10 px-[83px] py-[42px] relative bg-Cream rounded-[20px]'>
-        <div className='flex flex-col gap-5 items-center mx-auto'>
-          <span className='text-Tertiary font-bold'>Welcome {userName}!</span>
-          <div className="flex flex-col gap-2 items-center">
-            <span className='text-Tertiary font-black'>Total Donations:</span>
-            <span className="text-Primary font-black text-6xl"> RM {totalDonations.toFixed(2)}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3  justify-center align-center">
-            <Graphcard />
-            <div className="flex flex-col items-center justify-center  bg-Tertiary">
-              <h1 className="text-Green font-bold text-2xl text-center mb-2">
-                Your Progress : {totalScreened} / {userType === 'user' ? 45 : 900} Kg
-              </h1>
-              
-              <h1 className="text-Green font-bold text-2xl text-center mb-2">
-                Percentage: {Math.floor(getPercent(totalScreened))}%
-              </h1>
-              
-              
-              <div className="w-[80%] h-6 bg-Green rounded-full mt-5">
-                <div
-                  className={`h-6 rounded-full` + getProgressColor(getPercent(totalScreened))}
-                  style={{ width: `${getPercent(totalScreened)}%` }}
-                ></div>
-              </div>
-              <div className="mt-20 text-center text-Cream/40">The formula to count<p className="font-extrabold">Emissions (kg CO₂)</p> = Activity Data × Emission Factor Emissions(kg CO₂) = Activity Data×Emission Factor</div>
-            </div>
+      {/* Responsive Main Content Card */}
+      <div className='flex flex-col mx-auto w-full max-w-7xl h-max mb-12 md:mb-20 items-start gap-8 md:gap-10 px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10 lg:px-12 lg:py-12 relative bg-Cream rounded-lg md:rounded-xl lg:rounded-2xl'>
 
+        {/* Welcome and Stats Section */}
+        <div className='flex flex-col gap-6 md:gap-8 items-center w-full'>
+          {/* Responsive Welcome Text - Conditional Name */}
+          <span className='text-Tertiary font-bold text-xl sm:text-2xl md:text-3xl'>
+             Welcome {userType === 'user' ? (frontName || 'User') : (userName || 'Organization')}!
+          </span>
+          
+          {/* Total Donations - Updated Label */}
+          <div className="flex flex-col gap-1 items-center">
+            <span className='text-Tertiary font-black text-base sm:text-lg'>Global Total Donations:</span>
+            {isLoadingDonations ? (
+                <SkeletonLoader className="h-12 w-48" />
+            ) : donationError ? (
+                <span className="text-red-500 text-sm">{donationError}</span>
+            ) : (
+                <span className="text-Primary font-black text-4xl sm:text-5xl md:text-6xl"> RM {totalDonations.toFixed(2)}</span>
+            )}
           </div>
           
+          {/* Progress Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full">
+            {/* Pass userId prop to Graphcard - REMOVED userId prop */}
+            <Graphcard /> 
+            
+             {/* Progress Stats Card */}
+            <div className="flex flex-col items-center justify-center bg-Tertiary p-4 sm:p-6 rounded-lg">
+              {isLoadingScreened ? (
+                <>
+                    <SkeletonLoader className="h-8 w-3/4 mb-4" />
+                    <SkeletonLoader className="h-8 w-1/2 mb-6" />
+                    <SkeletonLoader className="h-6 w-[80%]" />
+                </>
+              ) : screenedError ? (
+                <span className="text-red-100 text-center">{screenedError}</span>
+              ) : (
+                <>
+                  <h1 className="text-Green font-bold text-lg sm:text-xl md:text-2xl text-center mb-2">
+                    Your Progress : {totalScreened.toFixed(1)} / {userType === 'user' ? 45 : 900} Kg
+                  </h1>
+                  <h1 className="text-Green font-bold text-lg sm:text-xl md:text-2xl text-center mb-4">
+                    Percentage: {Math.floor(currentProgressPercent)}%
+                  </h1>
+                  <div className="w-[80%] h-6 bg-gray-200 rounded-full overflow-hidden"> {/* Changed background */}
+                    <div
+                      className={`h-6 rounded-full transition-all duration-500 ease-out ${progressColorClass}`}
+                      style={{ width: `${currentProgressPercent}%` }}
+                    ></div>
+                  </div>
+                  <div className="mt-8 text-center text-Cream/50 text-xs sm:text-sm">The formula to count<p className="font-extrabold">Emissions (kg CO₂)</p> = Activity Data × Emission Factor</div>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className='flex flex-row gap-10 w-full items-center mx-auto'>
-          <div className='bg-Green w-4/5 h-60 rounded-2xl'>
-            <div className='flex flex-row h-full'>
-              <div id="Image Picture" className='container w-1/4 h-full bg-Primary rounded-l-2xl'></div>
-              <div className='flex flex-col gap-5 items-start m-8 ml-10 w-3/4'>
-                <span className='text-Tertiary font-bold text-4xl'>Start Donating your Trashes Now.</span>
-                <span className='text-Tertiary font-normal text-xl w-3/4 text-ellipsis overflow-hidden'>
-                  The more you donate trashes, the more money you can donate. From a simple household trash, converted into money to be sent to Waqf houses and used for numerous causes that will help everyone, from any kind, any age, and anyone.
+        {/* Call to Action Section */}
+        <div className='flex flex-col lg:flex-row gap-6 md:gap-8 w-full items-center'>
+           {/* Text Block */}
+          <div className='bg-Green w-full lg:w-3/4 rounded-lg md:rounded-xl overflow-hidden'>
+            <div className='flex flex-col sm:flex-row h-full'>
+              {/* Image Placeholder - Consider using an actual Image component or background image */}
+              <div id="Image Picture" className='hidden sm:block w-full sm:w-1/4 h-32 sm:h-auto bg-Primary'></div> 
+              <div className='flex flex-col gap-3 sm:gap-4 items-start p-4 sm:p-6 md:p-8 w-full sm:w-3/4'>
+                 {/* Responsive Text */}
+                <span className='text-Tertiary font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl'>Start Donating your Trashes Now.</span>
+                <span className='text-Tertiary font-normal text-sm sm:text-base md:text-lg w-full text-ellipsis overflow-hidden'>
+                  The more you donate trashes, the more money you can donate. From a simple household trash, converted into money to be sent to Waqf houses and used for numerous causes that will help everyone.
                 </span>
               </div>
             </div>
           </div>
 
+          {/* Button Block */}
           <div
-            className='btn btn-ghost bg-Green text-Tertiary font-extrabold w-1/5 rounded-2xl h-full flex flex-col py-20'
+            className='btn btn-ghost bg-Green text-Tertiary font-extrabold w-full lg:w-1/4 rounded-lg md:rounded-xl h-auto p-6 sm:p-8 flex flex-row sm:flex-col items-center justify-center gap-3 sm:gap-4 text-center cursor-pointer hover:bg-opacity-90 transition-colors'
             onClick={() => router.push('../landfills/chooseArea')}
           >
             <img
               src="https://img.icons8.com/?size=100&id=60996&format=png&color=000000"
               alt='leaf'
-              width={40}
-              height={40}
+              className='w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10' // Responsive icon size
             />
-            <span className='mx-auto'>Find Landfills near you!</span>
+             {/* Responsive Text */}
+            <span className='text-sm sm:text-base md:text-lg'>Find Landfills near you!</span>
           </div>
         </div>
 
-        <span className='text-Tertiary font-extrabold text-2xl mx-auto'>Check Your Transaction:</span>
-        <div className='flex flex-col gap-4'>
-          <Transactions userId={userId} userType={userType} />
+        {/* Transactions Section */}
+        <div className="w-full flex flex-col gap-3">
+          <span className='text-Tertiary font-extrabold text-lg sm:text-xl md:text-2xl text-center md:text-left'>Check Your Transaction:</span>
+          {isLoadingHistory ? ( // Assuming transactions might be part of history fetch or need their own
+             <SkeletonLoader className="h-20 w-full" />
+          ) : historyError ? ( 
+             <p className="text-red-500 text-center">Error loading transactions.</p>
+          ) : (
+            <div className='flex flex-col gap-4'>
+               {/* Pass loading/error state if Transactions component needs it */}
+              <Transactions userId={userId} userType={userType} /> 
+            </div>
+          )}
         </div>
 
-        <span className='text-Tertiary font-extrabold text-2xl mx-auto'>History:</span>
-        <div className='flex flex-col mx-auto w-full h-5/6 items-start relative bg-Cream rounded-[20px] overflow-hidden'>
-          <div className='flex flex-col gap-4 h-full overflow-y-auto'>
-            <History userId={userId} userType={userType} /> {/* Pass history items to History component */}
-          </div>
+        {/* History Section */}
+        <div className="w-full flex flex-col gap-3">
+          <span className='text-Tertiary font-extrabold text-lg sm:text-xl md:text-2xl text-center md:text-left'>History:</span>
+          {isLoadingHistory ? (
+            <>
+                <SkeletonLoader className="h-16 w-full mb-2" />
+                <SkeletonLoader className="h-16 w-full" />
+            </>
+          ) : historyError ? (
+             <p className="text-red-500 text-center">{historyError}</p>
+          ) : (
+            historyItems.length === 0 && !isLoadingHistory ? (
+                <p className="text-gray-500 text-center w-full bg-Cream p-6 rounded-lg">No history found.</p>
+            ) : (
+                <History userId={userId} userType={userType} /> 
+            )
+           )}
         </div>
       </div>
     </div>
@@ -202,17 +283,37 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
 export async function getServerSideProps(context: GetSessionParams | undefined) {
   const session = await getSession(context);
 
+  // If no session, redirect to login
+  if (!session) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
   const userId = session?.user?.id || null;
   const userType = session?.user?.type || null;
   const frontName = session?.user?.frontName || null;
-  const userName = session?.user?.userName || null; // Ensure you access userName here
+  const userName = session?.user?.userName || null;
+
+  // Basic check: If essential data like userId is missing, treat as unauthenticated
+  if (!userId) {
+     return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: {
       userId,
       userType,
       frontName,
-      userName, // Pass userName to the page
+      userName,
     },
   };
 }

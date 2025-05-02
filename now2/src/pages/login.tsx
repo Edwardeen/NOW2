@@ -10,6 +10,7 @@ const MyForm = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null); // State for error messages
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
   const router = useRouter();
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,35 +27,43 @@ const MyForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+    setError(null); // Clear previous errors
+    setIsLoading(true); // Set loading state to true
+
     try {
       const result = await signIn('credentials', {
         redirect: false,
         username,
         password,
       });
-  
+
       if (result?.error) {
+        // Use more specific error messages if possible based on result.error
+        if (result.error === "CredentialsSignin") {
+          throw new Error("Invalid username or password.");
+        }
         throw new Error(result.error);
       }
-  
-      // Redirect based on user type (stored in token)
-      const response = await fetch('/api/auth/session');
-      const session = await response.json();
-  
-      
+
+      // No need to fetch session here if signIn handles redirection or session setup
+      // Redirect logic might be handled by NextAuth callbacks or redirect:true option
+
+      // Assuming successful sign-in, clear fields and redirect
       setUsername('');
       setPassword('');
 
+      // Consider redirecting based on user role if available from session/signIn result
       router.push('/User/home');
     } catch (error: any) {
-      setError(error.message);
+      setError(error.message || "An unexpected error occurred."); // Set specific or generic error
+    } finally {
+      setIsLoading(false); // Set loading state to false regardless of outcome
     }
   };
   
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {error && <p className="text-red-500">{error}</p>} {/* Display error message */}
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>} {/* Display error message */}
       <label className="input input-bordered bg-Green text-Tertiary flex items-center gap-2">
         <input
           type="text"
@@ -63,6 +72,7 @@ const MyForm = () => {
           onChange={handleUsernameChange}
           placeholder="Username"
           required
+          disabled={isLoading} // Disable input when loading
         />
       </label>
 
@@ -74,8 +84,9 @@ const MyForm = () => {
           onChange={handlePasswordChange}
           placeholder="Enter your password"
           required
+          disabled={isLoading} // Disable input when loading
         />
-        <button type="button" onClick={togglePasswordVisibility} className="text-Tertiary">
+        <button type="button" onClick={togglePasswordVisibility} className="text-Tertiary" disabled={isLoading}>
           {showPassword ? (
             <img src="https://img.icons8.com/?size=100&id=60022&format=png&color=FFFFFF" className="w-5 h-5" />
           ) : (
@@ -83,8 +94,12 @@ const MyForm = () => {
           )}
         </button>
       </label>
-      <button type="submit" className="btn bg-Green text-Tertiary flex w-40 mx-auto">
-        Login
+      <button type="submit" className="btn bg-Green text-Tertiary flex w-40 mx-auto" disabled={isLoading}>
+        {isLoading ? (
+           <span className="loading loading-spinner loading-xs"></span> // Show spinner when loading
+        ) : (
+          'Login' // Show text when not loading
+        )}
       </button>
     </form>
   );
@@ -93,36 +108,34 @@ const MyForm = () => {
 export default function Page() {
   const router = useRouter();
   return (
-    <div className="bg-Green lg:p-20 flex items-center justify-center lg:bg-Green backdrop:bg-Green h-full">
-      <div id="cardBg" className="flex flex-col items-center gap-2.5 bg-Cream rounded-[20px] justify-between sm:w-3/4 sm:h-full md:w-3/4 lg:w-1/2 lg:h-3/4 md:h-full lg:my-20">
-        <div className="inline-flex flex-col items-center gap-[20px] px-0 py-5 relative">
-            <div className="inline-flex flex-col items-center relative flex-[0_0_auto]">
-              <div className="inline-flex flex-col items-center gap-[70px] relative flex-[0_0_auto]">
-                <div className="inline-flex flex-col h-[249px] items-center gap-px relative">
+    <div className="bg-Green p-4 sm:p-8 md:p-12 flex items-center justify-center min-h-screen">
+      <div id="cardBg" className="flex flex-col items-center gap-2.5 bg-Cream rounded-[20px] justify-between w-full sm:w-5/6 md:w-3/4 lg:w-2/3 xl:w-1/2 max-w-lg p-4 sm:p-6">
+        <div className="inline-flex flex-col items-center gap-[20px] w-full">
+            <div className="inline-flex flex-col items-center relative w-full">
+              <div className="inline-flex flex-col items-center gap-10 sm:gap-12 md:gap-16 relative w-full">
+                <div className="inline-flex flex-col items-center gap-2 relative w-full">
                   <img
-                    className="w-24 object-cover"
+                    className="w-16 sm:w-20 md:w-24 object-cover mb-2"
                     alt="Screenshot"
                     src={LogoIMG.src}
                   />
-                  <p className=" w-1/2 [ font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-[32px] text-center tracking-[0] leading-[normal]">
+                  <p className="w-full sm:w-3/4 md:w-2/3 [font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-xl sm:text-2xl md:text-3xl text-center tracking-[0] leading-tight sm:leading-normal">
                     <span className="font-medium">Welcome to </span>
                     <span className="[font-family:'Noto_Sans-Bold',Helvetica] font-bold">NOW²</span>
                     <span className="font-medium">!</span>
                   </p>
-                  <div className="w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-[25px] text-center tracking-[0] leading-[normal]">
+                  <div className="w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-lg sm:text-xl md:text-2xl text-center tracking-[0] leading-tight sm:leading-normal mt-1">
                     Be Wiser Be Greener
                   </div>
-                  <div className="flex w-[148px] items-center justify-center gap-2.5 px-0 py-2 relative flex-[0_0_auto] mb-[-65.00px]">
-                    <div className="relative flex-1 mt-8 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-xl text-center tracking-[0] leading-[normal]">
+                  <div className="relative mt-6 mb-2 [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-lg sm:text-xl text-center tracking-[0] leading-tight sm:leading-normal">
                       Sign-in
-                    </div>
                   </div>
                 </div>
                 <MyForm />
               </div>
-              <div id="registerText" className="btn btn-ghost relative w-fit h-[21px] [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-xl text-center tracking-[0] leading-[normal] whitespace-nowrap m-20" onClick={() => router.push('/register')}>
-                <span className="[font-family:'Noto_Sans-Medium',Helvetica] font-medium text-black text-xl tracking-[0]">
-                  Haven’t got an account?{" "}
+              <div id="registerText" className="btn btn-ghost relative w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-Green text-base sm:text-lg text-center tracking-[0] leading-normal whitespace-nowrap mt-8 mb-4 sm:mt-12 sm:mb-6" onClick={() => router.push('/register')}>
+                <span className="[font-family:'Noto_Sans-Medium',Helvetica] font-medium text-black tracking-[0]">
+                  Haven't got an account?{" "}
                 </span>
                 <span className="underline">Register</span>
               </div>

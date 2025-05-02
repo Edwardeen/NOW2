@@ -59,10 +59,9 @@ interface TransactionData {
 // Props Interface for Card Component
 interface CardProps {
   data: TransactionData;
-  key : number;
 }
 
-export default function Card({ data, key }: CardProps) {
+export default function Card({ data }: CardProps) {
   const {
     id,
     transactionDate,
@@ -83,73 +82,126 @@ export default function Card({ data, key }: CardProps) {
     TransformerID,
   } = data;
 
-    const [transformed, setTransformed] = useState(transactionTransfered);
-    const [transfered, setTransfered] = useState(transactionTransformed);
-    const [totalScreenedInput, setTotalScreenedInput] = useState(transactionAmount);
+    const [transformed, setTransformed] = useState(transactionTransformed);
+    const [transfered, setTransfered] = useState(transactionTransfered);
+    const [transactionAmountInput, setTransactionAmountInput] = useState(transactionAmount || 0);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [submitSuccess, setSubmitSuccess] = useState(false);
 
     const handleSubmit = async () => {
+      setIsSubmitting(true);
+      setSubmitError(null);
+      setSubmitSuccess(false);
+
       try {
-      
-        
+        const payload = {
+          transactionTransformed: transformed,
+          transactionTransfered: transfered,
+          transactionAmount: transactionAmountInput,
+        };
+        console.log(`Updating transaction ${id} with payload:`, payload);
 
+        const response = await axios.put(`/api/transactions/update/${id}`, payload);
 
-        const response = await axios.put(`/api/transactions/update/${id}`, {
-            transactionScreened: transactionScreened,
-            transactionDeposited: transactionDeposited,
-            transactionAmount: totalScreenedInput,
-            transactionTransformed: transformed,
-            transactionTransfered: transfered,
-            totalScreened: totalScreened
-        });
+        console.log('Update response:', response.data);
+        setSubmitSuccess(true);
+        setTimeout(() => setSubmitSuccess(false), 3000);
 
-        if(transformed && transfered && transactionDeposited && transactionScreened ){
-          alert("transaction deleted, please refresh the page");
-        }
-        console.log(response.data);
-      } catch (error) {
-        console.error('Error submitting transaction:', error);
+      } catch (error: any) {
+        console.error('Error submitting transaction update:', error);
+        const errorMsg = error.response?.data?.error || error.message || 'Failed to update transaction.';
+        setSubmitError(errorMsg);
+      } finally {
+        setIsSubmitting(false);
       }
     }
-   
-    
+
+    const canSubmit = transformed && transfered && transactionAmountInput > 0 && !isSubmitting;
 
     return (
-    <div className="rounded-3xl bg-Primary w-full p-5 mt-5">
-        <h1 className='text-2xl text-white text-center font-bold'> Transaction ID : {id}</h1>
-        <h1 className='text-xl text-white text-center'>{ new Date(transactionDate).toLocaleDateString() }</h1>
+    <div className="rounded-lg md:rounded-xl bg-Green text-Tertiary w-full p-3 sm:p-4 shadow-md">
+        <h1 className='text-lg sm:text-xl text-center font-bold mb-1'> Transaction ID : {id}</h1>
+        <h1 className='text-sm sm:text-base text-center mb-3'>{ new Date(transactionDate).toLocaleDateString() }</h1>
 
-        <h1 className='mt-2 text-xl text-white text-left'>Type : {transactionType}</h1>
-        <h1 className='mt-2 text-xl text-white text-left'>description : {transactionDescription}</h1>
-        <h1 className='mt-2 text-xl text-white text-left'>Total Screened : {totalScreened}</h1>
+        <h1 className='text-base sm:text-lg text-left mb-1'>Type : {transactionType}</h1>
+        <h1 className='text-base sm:text-lg text-left mb-1 break-words'>Description : {transactionDescription}</h1>
+        <h1 className='text-base sm:text-lg text-left mb-3 font-semibold'>Total Screened : {totalScreened} Kg</h1>
+        <h1 className='text-base sm:text-lg text-left mb-3 font-semibold'>
+          Donor: {
+             data.User ? `${data.User.frontName || ''} ${data.User.familyName || ''}`.trim() :
+             data.Entity ? data.Entity.companyName : 
+             'Unknown Donor'
+           }
+        </h1>
       
-        <input type="number" className="mt-5 w-full p-2 rounded-md bg-white text-Tertiary font-bold" placeholder="Transaction amount" onChange={(e) => setTotalScreenedInput(parseInt(e.target.value))} value={totalScreenedInput} />
+        <label className="form-control w-full mb-4">
+          <div className="label">
+            <span className="label-text text-Tertiary">Final Transaction Amount (RM):</span>
+          </div>
+          <input 
+             type="number" 
+             className="input input-bordered w-full bg-Cream text-Tertiary font-bold focus:outline-none focus:border-Primary h-10 px-3" 
+             placeholder="Enter final RM amount"
+             onChange={(e) => setTransactionAmountInput(parseFloat(e.target.value) || 0)}
+             value={transactionAmountInput}
+             disabled={isSubmitting || (transformed && transfered)}
+             min="0"
+             step="0.01"
+           />
+        </label>
         
 
-        <div className="grid grid-cols-2 mt-5">
-            <div>
-                <h1 className='mt-2 text-xl text-white text-left'>Transaction Transformed</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div className="flex flex-col items-start">
+                <span className='text-base text-left mb-1'>Mark as Transformed</span>
                 <label className="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" className="sr-only peer" onChange={(e) => setTransformed(e.target.checked)} checked={transformed}/>
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      onChange={(e) => setTransformed(e.target.checked)}
+                      checked={transformed} 
+                      disabled={isSubmitting} 
+                    />
+                    <div className="relative w-11 h-6 bg-gray-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-Primary"></div>
                 </label>
             </div>
 
-            
-            <div>        
-                <h1 className='mt-2 text-xl text-white text-left'>Transaction Transfered</h1>
+            <div className="flex flex-col items-start">        
+                <span className='text-base text-left mb-1'>Mark as Transferred</span>
                 <label className="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" value="" className="sr-only peer" onChange={(e) => setTransfered(e.target.checked)} checked={transfered}/>
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      onChange={(e) => setTransfered(e.target.checked)} 
+                      checked={transfered} 
+                      disabled={isSubmitting}
+                     />
+                    <div className="relative w-11 h-6 bg-gray-400 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-Primary"></div>
                 </label>
             </div>
         </div>
 
-        <button type="submit" className="bg-Tertiary text-white w-full p-3 mt-5" onClick={handleSubmit}>Submit</button>
+         {submitError && (
+           <p className="text-red-400 text-sm text-center mb-3">Error: {submitError}</p>
+         )}
 
-        
+        <button 
+          type="button" 
+          className={`btn w-full p-3 mt-3 text-base sm:text-lg transition-colors duration-300 ${submitSuccess ? 'bg-green-500 text-white' : 'bg-Tertiary text-white hover:bg-opacity-80'} disabled:opacity-50`} 
+          onClick={handleSubmit}
+          disabled={!canSubmit || submitSuccess}
+         >
+            {isSubmitting ? (
+                <span className="loading loading-spinner loading-sm"></span>
+            ) : submitSuccess ? (
+                 '✓ Updated'
+            ) : (
+                 'Confirm Transformation & Transfer'
+            )}
+        </button>
     </div>
-   
-    
   );
 };
 
