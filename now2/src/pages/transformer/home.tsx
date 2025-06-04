@@ -88,6 +88,17 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Callback to handle when a transaction is confirmed by the CardForm
+  const handleTransactionConfirmed = (confirmedId: number) => {
+    setData(prevData => 
+      prevData.map(item => 
+        item.id === confirmedId 
+          ? { ...item, transactionTransformed: true, transactionTransfered: true } 
+          : item
+      )
+    );
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -110,8 +121,9 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // Updated Filter Logic: Show items that are screened but not yet fully transformed AND transferred
   const filteredData = data.filter(
-    (item) => item.transactionScreened && !item.transactionTransformed
+    (item) => item.transactionScreened && (!item.transactionTransformed || !item.transactionTransfered)
   );
 
   return (
@@ -149,7 +161,11 @@ export default function Home() {
         ) : (
              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {filteredData.map((item) => (
-                    <CardForm key={item.id} data={item} />
+                    <CardForm 
+                        key={item.id} 
+                        data={item} 
+                        onTransactionConfirmed={handleTransactionConfirmed}
+                    />
                 ))}
             </div>
         )}

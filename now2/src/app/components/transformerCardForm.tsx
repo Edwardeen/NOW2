@@ -59,9 +59,10 @@ interface TransactionData {
 // Props Interface for Card Component
 interface CardProps {
   data: TransactionData;
+  onTransactionConfirmed?: (transactionId: number) => void;
 }
 
-export default function Card({ data }: CardProps) {
+export default function Card({ data, onTransactionConfirmed }: CardProps) {
   const {
     id,
     transactionDate,
@@ -107,7 +108,10 @@ export default function Card({ data }: CardProps) {
 
         console.log('Update response:', response.data);
         setSubmitSuccess(true);
-        setTimeout(() => setSubmitSuccess(false), 3000);
+        if (onTransactionConfirmed) {
+          onTransactionConfirmed(id);
+        }
+        setTimeout(() => setSubmitSuccess(false), 1500);
 
       } catch (error: any) {
         console.error('Error submitting transaction update:', error);
@@ -189,7 +193,7 @@ export default function Card({ data }: CardProps) {
 
         <button 
           type="button" 
-          className={`btn w-full p-3 mt-3 text-base sm:text-lg transition-colors duration-300 ${submitSuccess ? 'bg-green-500 text-white' : 'bg-Tertiary text-white hover:bg-opacity-80'} disabled:opacity-50`} 
+          className={`btn w-full h-auto whitespace-normal py-2 px-3 mt-3 text-base sm:text-lg transition-colors duration-300 ${submitSuccess ? 'bg-green-500 text-white' : 'bg-Tertiary text-white hover:bg-opacity-80'} disabled:opacity-50`}
           onClick={handleSubmit}
           disabled={!canSubmit || submitSuccess}
          >

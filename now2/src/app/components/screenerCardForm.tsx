@@ -59,9 +59,10 @@ interface TransactionData {
 // Props Interface for Card Component
 interface CardProps {
   data: TransactionData;
+  onTransactionConfirmed?: (transactionId: number) => void;
 }
 
-export default function Card({ data }: CardProps) {
+export default function Card({ data, onTransactionConfirmed }: CardProps) {
   const {
     id,
     transactionDate,
@@ -97,6 +98,7 @@ export default function Card({ data }: CardProps) {
       try {
         const payload = {
             transactionScreened: screened,
+            transactionDeposited: deposited,
             totalScreened: totalScreenedInput,
         };
         console.log(`Updating transaction ${id} with payload:`, payload);
@@ -105,7 +107,12 @@ export default function Card({ data }: CardProps) {
         
         console.log('Update response:', response.data);
         setSubmitSuccess(true);
-        setTimeout(() => setSubmitSuccess(false), 3000); 
+        if (onTransactionConfirmed) {
+          onTransactionConfirmed(id);
+        }
+        setTimeout(() => {
+          setSubmitSuccess(false); 
+        }, 1500);
 
       } catch (error: any) {
         console.error('Error submitting transaction update:', error);
@@ -116,7 +123,7 @@ export default function Card({ data }: CardProps) {
       }
     }
 
-    const canSubmit = screened && totalScreenedInput > 0 && !isSubmitting;
+    const canSubmit = screened && deposited && totalScreenedInput > 0 && !isSubmitting;
    
     return (
     <div className="rounded-lg md:rounded-xl bg-Green text-Tertiary w-full p-3 sm:p-4 shadow-md">
@@ -166,13 +173,13 @@ export default function Card({ data }: CardProps) {
 
             <div className="flex flex-col items-start">
                 <span className='text-base text-left mb-1'>Deposited</span>
-                <label className="inline-flex items-center opacity-70">
+                <label className="inline-flex items-center cursor-pointer">
                     <input 
                       type="checkbox" 
                       className="sr-only peer" 
                       checked={deposited} 
-                      readOnly 
-                      disabled
+                      onChange={(e) => setDeposited(e.target.checked)}
+                      disabled={isSubmitting}
                     />
                     <div className="relative w-11 h-6 bg-gray-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-Primary"></div>
                 </label>
