@@ -84,7 +84,7 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       const companyInfo = [
-        "NOW² Platform",
+        "WBC Platform",
       ];
       doc.text(companyInfo, pageWidth - margin, headerStartY, { align: "right" }); // Align with top of logo
       // y remains below the logo
@@ -220,11 +220,11 @@ const HistoryCard: React.FC<HistoryCardProps> = ({
 
       doc.setFontSize(9);
       doc.setFont("helvetica", "italic");
-      const footerText = "This receipt confirms the transaction details recorded in the NOW² system. Generated on: " + new Date().toLocaleString();
+      const footerText = "This receipt confirms the transaction details recorded in the WBC system. Generated on: " + new Date().toLocaleString();
       doc.text(footerText, pageWidth / 2, y, { align: "center", maxWidth: contentWidth });
 
       // Save the PDF
-      doc.save(`NOW2_Receipt_HIST-${id}.pdf`);
+      doc.save(`WBC_Receipt_HIST-${id}.pdf`);
 
     } catch (error) {
       console.error("Failed to generate PDF:", error);
