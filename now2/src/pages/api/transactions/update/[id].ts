@@ -36,9 +36,10 @@ export default async function PUT(req: NextApiRequest, res: NextApiResponse) {
       updatedTransaction.transactionScreened &&
       updatedTransaction.transactionDeposited &&
       updatedTransaction.transactionTransformed &&
-      updatedTransaction.transactionTransfered
+      updatedTransaction.transactionTransfered &&
+      updatedTransaction.transactionStatus !== 'FAILED'
     ) {
-      console.log("Transaction fully processed. Creating history for transaction ID:", updatedTransaction.id);
+      console.log("Transaction fully processed and status is not FAILED. Creating history for transaction ID:", updatedTransaction.id);
       try {
         const historyEntry = await prisma.history.create({
           data: {
@@ -65,23 +66,26 @@ export default async function PUT(req: NextApiRequest, res: NextApiResponse) {
         return res.status(200).json(historyEntry); // Respond with the created history entry
       } catch (historyError) {
         console.error("Error during history creation or transaction deletion:", historyError);
-        // If history creation/deletion fails, the original transaction is still updated.
-        // We might want to return the updatedTransaction here with an error message, 
-        // or a more specific error.
         return res.status(500).json({
           error: "Failed to finalize transaction and move to history. Transaction was updated but not moved.",
-          updatedTransactionData: updatedTransaction // Optionally return the updated data
+          updatedTransactionData: updatedTransaction 
         });
       }
     } else {
-      // Transaction updated but not yet ready for history
-      console.log("Transaction updated but not yet fully finalized. ID:", updatedTransaction.id);
+      let logMessage = "Transaction updated. Reason for not moving to history: ";
+      if (updatedTransaction.transactionStatus === 'FAILED') {
+        logMessage += "Transaction status is FAILED. ";
+      }
+      if (!updatedTransaction.transactionScreened) logMessage += "Not screened. ";
+      if (!updatedTransaction.transactionDeposited) logMessage += "Not deposited. ";
+      if (!updatedTransaction.transactionTransformed) logMessage += "Not transformed. ";
+      if (!updatedTransaction.transactionTransfered) logMessage += "Not transferred. ";
+      console.log(logMessage, "ID:", updatedTransaction.id);
       return res.status(200).json(updatedTransaction);
     }
   } catch (error) {
     console.error("Error updating transaction:", error);
-    // Check if it's a Prisma error for record not found (e.g., during update)
-    if ((error as any).code === 'P2025') { // Prisma's error code for record not found
+    if ((error as any).code === 'P2025') { 
         return res.status(404).json({ error: `Transaction with ID ${transactionId} not found.` });
     }
     return res.status(500).json({ error: "Failed to update transaction" });
