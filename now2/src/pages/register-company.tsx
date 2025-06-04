@@ -358,7 +358,7 @@ export default function Page() {
                                 />
                                 <p className="w-full [font-family:'Noto_Sans-Medium',Helvetica] font-normal text-[#344e41] text-xl sm:text-2xl md:text-3xl text-center tracking-[0] leading-tight sm:leading-normal">
                                     <span className="font-medium">Welcome to </span>
-                                    <span className="[font-family:'Noto_Sans-Bold',Helvetica] font-bold">NOW²</span>
+                                    <span className="[font-family:'Noto_Sans-Bold',Helvetica] font-bold">Waste Based Charity</span>
                                     <span className="font-medium">!</span>
                                 </p>
                                 <div className="relative w-fit [font-family:'Noto_Sans-Medium',Helvetica] font-medium text-[#344e41] text-lg sm:text-xl md:text-2xl text-center tracking-[0] leading-tight sm:leading-normal mt-1">
