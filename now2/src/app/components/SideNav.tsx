@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import LogoIMG from "../../public/logo.png";
 import { useRouter } from 'next/router';
@@ -13,11 +13,11 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen, onClose }) => {
   const sideNavRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const handleClickOutside = (event: MouseEvent) => {
+  const handleClickOutside = useCallback((event: MouseEvent) => {
     if (sideNavRef.current && !sideNavRef.current.contains(event.target as Node)) {
       onClose();
     }
-  };
+  }, [onClose]);
 
   useEffect(() => {
     if (isOpen) {

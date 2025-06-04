@@ -24,7 +24,7 @@ const modelNamesInDeletionOrder: Prisma.ModelName[] = [
   // Foundational models or those with fewer incoming dependencies from the above
   'Screener',
   'Transformer',
-  'LandfillArea',
+  'landfillArea',
   'WaqfCause',      // Referenced by CauseOnWaqf
   
   // Standalone or least dependent models
@@ -56,7 +56,7 @@ async function clearDatabase() {
       // @ts-ignore
       operationsWithNames.push({ name: modelName, op: prisma[clientKey].deleteMany({}) });
     } else {
-      console.warn(`Model ${modelName} (accessor ${clientKey}) not found on Prisma client or does not support deleteMany. Skipping.`);
+      console.warn(`Model ${modelName} (accessor ${String(clientKey)}) not found on Prisma client or does not support deleteMany. Skipping.`);
     }
   }
 
