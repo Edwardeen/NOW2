@@ -62,7 +62,8 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen, onClose }) => {
                 height={80}
                 className='object-contain'
               />
-              <h2 className="text-base sm:text-lg font-bold text-Tertiary text-right">Net <br /> Zero <br /> Waste <br /> Wise</h2>
+              <h1 className="text-xl sm:text-2xl font-bold text-Tertiary text-right">Waste <br /> Based <br /> Charity</h1>
+              
             </div>
           </div>
           <div className='flex flex-col justify-normal items-start mx-4 gap-2 sm:gap-3 mt-8 sm:mt-10 flex-grow'>

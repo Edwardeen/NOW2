@@ -145,7 +145,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
           <Header />
           <div className='flex flex-row gap-2 items-center'>
              {/* Responsive Logo/Text */}
-            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>NOW²</span>
+            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>WBC</span>
             <Image src={LogoIMG} alt="Logo" height={80} width={80} className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20" />
           </div>
         </div>

@@ -124,7 +124,7 @@ export default function Home() {
         <div className='flex flex-row justify-between items-center py-2'>
           <Header /> { /* Added Standard Header */}
           <div className='flex flex-row gap-2 items-center'>
-            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>NOW²</span>
+            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>WBC</span>
             <Image 
                 src={LogoIMG} 
                 alt="Logo" 

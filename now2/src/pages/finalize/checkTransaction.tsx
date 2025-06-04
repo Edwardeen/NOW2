@@ -217,7 +217,7 @@ export default function CheckTransaction({ userId, userType, userName, frontName
           <Header />
           <div className='flex flex-row gap-2 items-center'>
              {/* Responsive Text and Logo */}
-            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>NOW²</span>
+            <span className='hidden sm:flex flex-col my-auto text-Tertiary font-extrabold text-2xl md:text-3xl lg:text-4xl'>WBC</span>
             <Image
               src={LogoIMG}
               alt="Logo"
