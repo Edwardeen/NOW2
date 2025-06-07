@@ -76,18 +76,27 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
     fetchTotalDonations();
   }, []);
 
-  // Fetch total screened (User Specific)
+  // Fetch total screened (User or Entity Specific)
   useEffect(() => {
     const fetchTotalScreened = async () => {
-      if (!userId) { // Don't fetch if userId is not available
+      if (!userId || !userType) {
         setIsLoadingScreened(false);
         return;
       }
       setIsLoadingScreened(true);
       setScreenedError(null);
       try {
-        // Fetch from the new user-specific endpoint
-        const response = await axios.get(`/api/user/${userId}/screened-total`); 
+        let url = '';
+        if (userType === 'user') {
+          url = `/api/user/${userId}/screened-total`;
+        } else if (userType === 'entity') {
+          url = `/api/entity/${userId}/screened-total`;
+        } else {
+          setIsLoadingScreened(false);
+          setScreenedError('Invalid user type.');
+          return;
+        }
+        const response = await axios.get(url);
         setTotalScreened(response.data.totalScreened || 0);
       } catch (error: any) {
         console.error('Error fetching screened total:', error);
@@ -97,7 +106,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
       }
     }
     fetchTotalScreened();
-  }, [userId]);
+  }, [userId, userType]);
 
   // Fetch history data
   useEffect(() => {
@@ -175,7 +184,7 @@ export default function Home({ userId, userType, userName, frontName }: HomeProp
           
           {/* Progress Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 w-full">
-            {/* Pass userId prop to Graphcard - REMOVED userId prop */}
+            {/* Pass userId and userType props to Graphcard */}
             <Graphcard /> 
             
              {/* Progress Stats Card */}

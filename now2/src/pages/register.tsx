@@ -46,7 +46,16 @@ const MyForm = () => {
                 setIC(value);
                 break;
             case 'phoneNumber':
-                setPhoneNumber(value);
+                {
+                    if (phoneNumber.startsWith('+60') && !value.startsWith('+60') && value.length < phoneNumber.length) {
+                        setPhoneNumber('');
+                    } else if (!value.startsWith('+60')) {
+                        const digits = value.replace(/\D/g, '');
+                        setPhoneNumber(digits ? `+60${digits}` : '');
+                    } else {
+                        setPhoneNumber(value);
+                    }
+                }
                 break;
             case 'password':
                 setPassword(value);
@@ -335,7 +344,7 @@ export default function Page() {
                             <div className="inline-flex flex-col items-center gap-2 relative w-full">
                                 {/* Responsive Logo */}
                                 <img
-                                    className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover mb-2"
+                                    className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain mb-2"
                                     alt="Screenshot"
                                     src={LogoIMG.src}
                                 />

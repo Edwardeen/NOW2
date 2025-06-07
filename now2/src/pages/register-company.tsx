@@ -45,11 +45,29 @@ const MyForm = () => {
             case 'email':
                 setEmail(value);
                 break;
-            case 'PicPhoneNumber':
-                setPicPhoneNumber(value);
+            case 'picPhoneNumber':
+                {
+                    if (picPhoneNumber.startsWith('+60') && !value.startsWith('+60') && value.length < picPhoneNumber.length) {
+                        setPicPhoneNumber('');
+                    } else if (!value.startsWith('+60')) {
+                        const digits = value.replace(/\D/g, '');
+                        setPicPhoneNumber(digits ? `+60${digits}` : '');
+                    } else {
+                        setPicPhoneNumber(value);
+                    }
+                }
                 break;
             case 'companyPhoneNumber':
-                setCompanyPhoneNumber(value);
+                {
+                    if (companyPhoneNumber.startsWith('+60') && !value.startsWith('+60') && value.length < companyPhoneNumber.length) {
+                        setCompanyPhoneNumber('');
+                    } else if (!value.startsWith('+60')) {
+                        const digits = value.replace(/\D/g, '');
+                        setCompanyPhoneNumber(digits ? `+60${digits}` : '');
+                    } else {
+                        setCompanyPhoneNumber(value);
+                    }
+                }
                 break;
             case 'password':
                 setPassword(value);
@@ -352,7 +370,7 @@ export default function Page() {
                         <div className="inline-flex flex-col items-center gap-10 sm:gap-12 md:gap-16 w-full">
                             <div className="inline-flex flex-col items-center gap-2 relative w-full">
                                 <img
-                                    className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover mb-2"
+                                    className="relative w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain mb-2"
                                     alt="Screenshot"
                                     src={LogoIMG.src}
                                 />
