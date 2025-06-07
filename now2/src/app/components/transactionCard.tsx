@@ -31,37 +31,56 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
 
   return (
     <div
-      className="flex flex-col p-4 rounded-3xl bg-Green text-Tertiary mb-4 cursor-pointer max-w-[550px] h-96"
+      className="flex flex-col p-3 sm:p-4 rounded-lg md:rounded-xl bg-Green text-Tertiary mb-4 cursor-pointer shadow-md hover:shadow-lg transition-shadow h-full"
       onClick={handleCardClick} // Add click handler
     >
-      <Image
-        loading="lazy"
-        src={imageUrl}
-        alt={`Image of ${waqfName}`}
-        className="object-cover h-1/3 rounded-3xl w-full"
-        width={600}
-        height={100}
-      />
-      <div className="flex flex-col px-4 mt-4">
-        <div className="flex flex-wrap gap-10 justify-between items-center w-full text-3xl">
-          <div className="self-stretch my-auto font-bold">
+      <div className="relative w-full h-32 sm:h-40 md:h-48 mb-3 sm:mb-4">
+        <Image
+          loading="lazy"
+          src={imageUrl}
+          alt={`Image of ${waqfName}`}
+          className="object-cover rounded-md md:rounded-lg"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+        />
+      </div>
+      <div className="flex flex-col px-1 sm:px-2 flex-grow">
+        <div className="flex flex-wrap gap-2 justify-between items-center w-full text-base sm:text-lg md:text-xl">
+          <div className="font-bold">
             <span>{waqfName}</span>
           </div>
-          <div className="self-stretch my-auto font-semibold">
+          <div className="font-semibold text-sm sm:text-base">
             <span>Status: {transactionStatus}</span>
           </div>
         </div>
-        <div className="mt-5">
-          <span>Transaction Date: {transactionDate}</span>
+        <div className="mt-2 text-xs sm:text-sm">
+          <span>Date: {transactionDate}</span>
         </div>
-        <div className="mt-5">
-          <span>Transaction Amount: RM{transactionAmount.toFixed(2)}</span>
+        <div className="mt-1 text-xs sm:text-sm">
+          <span>Amount: RM{transactionAmount.toFixed(2)}</span>
         </div>
         {additionalInfo && (
-          <div className="mt-5">
-            <span>Additional Info: {additionalInfo}</span>
+          <div className="mt-1 text-xs sm:text-sm text-gray-400">
+            <span>Info: {additionalInfo}</span>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+// Skeleton Card for Loading State
+const TransactionSkeletonCard: React.FC = () => {
+  return (
+    <div className="flex flex-col p-3 sm:p-4 rounded-lg md:rounded-xl bg-gray-200 animate-pulse mb-4 h-full min-h-[280px] sm:min-h-[320px]">
+      <div className="w-full h-32 sm:h-40 md:h-48 mb-3 sm:mb-4 bg-gray-300 rounded-md md:rounded-lg"></div>
+      <div className="flex flex-col px-1 sm:px-2 flex-grow">
+        <div className="flex flex-wrap gap-2 justify-between items-center w-full">
+          <div className="h-6 w-3/5 bg-gray-300 rounded"></div>
+          <div className="h-5 w-1/4 bg-gray-300 rounded"></div>
+        </div>
+        <div className="mt-2 h-4 w-1/2 bg-gray-300 rounded"></div>
+        <div className="mt-1 h-4 w-1/3 bg-gray-300 rounded"></div>
       </div>
     </div>
   );
@@ -78,11 +97,18 @@ interface TransactionsProps {
 const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      if (!userId) return;
-
+      if (!userId) {
+        setIsLoading(false);
+        setError("User not identified.");
+        return;
+      }
+      
+      setIsLoading(true);
+      setError(null);
       try {
         const response = await fetch(`/api/transactions/${userId}`);
         if (!response.ok) {
@@ -99,28 +125,12 @@ const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
             transactionStatus = 'Awaiting Screening';
             
             if (transaction.transactionScreened == true) {
-                transactionStatus = `Screened for ${transaction.totalScreened}, awaiting Transformer`;
+                transactionStatus = `Screened: ${transaction.totalScreened}kg`;
                 
                 if (transaction.transactionTransformed == true) {
-                    transactionStatus = 'Awaiting Transfer';
+                    transactionStatus = 'Ready for Transfer';
 
                     if (transaction.transactionTransfered == true) {
-                        // Logic to send data to History table
-                        await fetch('/api/history', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            historyDate: transaction.transactionDate,
-                            historyDescription: transaction.transactionDescription,
-                            UserID: transaction.UserID,
-                            EntityID: transaction.EntityID,
-                            LandfillName: transaction .LandfillsID, // Assuming you have a way to get the landfill name
-                            WaqfName: waqfData.waqfName,
-                            totalTransferred: transaction.transactionAmount,
-                          }),
-                        });
                         transactionStatus = 'Transferred';
                       } 
                   } 
@@ -131,8 +141,8 @@ const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
 
           return {
             ...transaction,
-            waqfName: waqfData.waqfName,
-            imageUrl: waqfData.imageUrl,
+            waqfName: waqfData.waqfName || 'Waqf Name Unavailable',
+            imageUrl: waqfData.imageUrl || '/placeholder-image.png',
             transactionStatus,
           };
         }));
@@ -141,18 +151,30 @@ const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
       } catch (error: any) {
         console.error('Error fetching transactions:', error);
         setError('Could not load transactions. Please try again later.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTransactions();
   }, [userId]);
 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, index) => (
+          <TransactionSkeletonCard key={index} />
+        ))}
+      </div>
+    );
+  }
+
   if (error) {
-    return <div className="text-red-500">{error}</div>;
+    return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
   if (!transactions.length) {
-    return <div>No transactions found.</div>;
+    return <div className="text-gray-500 text-center p-4">No transactions found.</div>;
   }
 
   return (
@@ -161,9 +183,9 @@ const Transactions: React.FC<TransactionsProps> = ({ userId, userType }) => {
         <TransactionCard
           key={transaction.id}
           id={transaction.id}
-          imageUrl={transaction.imageUrl}
+          imageUrl={transaction.imageUrl || '/placeholder-image.png'}
           waqfName={transaction.waqfName}
-          transactionDate={new Date(transaction.transactionDate).toLocaleDateString()} // Format date
+          transactionDate={new Date(transaction.transactionDate).toLocaleDateString()}
           transactionAmount={transaction.transactionAmount}
           transactionStatus={transaction.transactionStatus}
         />

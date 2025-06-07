@@ -13,41 +13,41 @@ interface Waqf {
 }
 
 interface CauseCardProps extends Waqf {
-  landfillId: string | null; // Add the landfillId prop
+  landfillId: string | null;
 }
 
 const CauseCard: React.FC<CauseCardProps> = ({ id, imageUrl, waqfName, waqfPhoneNumber, waqfAddress, causes, landfillId }) => {
-  // Use landfillId as needed in the card (for example, display or use it for making further requests)
-  console.log("Landfill ID passed to CauseCard:", landfillId); // Example use
+  // Construct the link href safely, handle null landfillId
+  const linkHref = landfillId ? `/waqfs/${id}?landfillId=${landfillId}` : `/waqfs/${id}`;
 
   return (
-    <Link href={`/waqfs/${id}?landfillId=${landfillId}`}>
-      <div className="flex flex-col justify-center p-4 rounded-3xl bg-Green/80 text-zinc-800 mb-4 cursor-pointer h-80 w-full">
-        <div className='flex h-1/3 w-full'>
+    <Link href={linkHref} className="block h-full">
+      {/* Removed fixed height, adjusted padding/structure */}
+      <div className="flex flex-col h-full rounded-lg md:rounded-xl bg-Green/80 text-zinc-800 shadow-md hover:shadow-lg transition-shadow cursor-pointer overflow-hidden">
+        {/* Image Container */}
+        <div className='relative h-40 sm:h-48 w-full flex-shrink-0'>
           <Image
             loading="lazy"
-            src={imageUrl}
+            src={imageUrl || '/placeholder-image.png'} // Fallback image
             alt={`Image of ${waqfName}`}
-            className="object-cover rounded-3xl w-full h-72 overflow-hidden"
-            width={400}
-            height={200}
+            fill // Use fill layout
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw" // Adjust as needed
           />
         </div>
         
-        <div className="flex flex-col px-4 h-2/3 bg-gradient-to-b from-black/0 to-black/95 items-wrap rounded-3xl text-white">
-          <div className="flex flex-col gap-5 mb-2 justify-between my-auto items-center w-full text-3xl">
-            <div className="self-stretch text-4xl my-auto font-bold">
-              <span>{waqfName}</span>
-            </div>
-            <div className="self-stretch text-sm font-semibold">
-              <span>{waqfPhoneNumber}</span>
-            </div>
-          </div>
-          <div className="text-sm">
-            <span>{waqfAddress}</span>
-          </div>
-          <div className="font-semibold text-sm pb-3">
-            <span>Cause: {causes}</span>
+        {/* Text Content with Gradient Overlay */}
+        {/* Note: Gradient might look different without fixed height */}
+        {/* Consider applying gradient to a pseudo-element or inner div if needed */}
+        <div className="relative flex flex-col flex-grow p-3 sm:p-4 bg-gradient-to-t from-black/80 via-black/50 to-transparent text-white">
+           {/* Push content to bottom using flex-grow on spacer */} 
+           <div className="flex-grow"></div> 
+           <div className="flex flex-col gap-1 z-10"> {/* Ensure text is above gradient */}
+             {/* Responsive Text */}
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">{waqfName}</h2>
+            <p className="text-xs sm:text-sm font-semibold truncate">{waqfPhoneNumber}</p>
+            <p className="text-xs sm:text-sm mt-1 line-clamp-2">{waqfAddress}</p> {/* Limit address lines */}
+            <p className="font-semibold text-xs sm:text-sm mt-1">Cause: {causes}</p>
           </div>
         </div>
       </div>
@@ -55,35 +55,75 @@ const CauseCard: React.FC<CauseCardProps> = ({ id, imageUrl, waqfName, waqfPhone
   );
 };
 
+// Skeleton for CauseCard
+const CauseCardSkeleton: React.FC = () => {
+  return (
+    <div className="flex flex-col h-full rounded-lg md:rounded-xl bg-gray-200 animate-pulse overflow-hidden">
+      <div className='relative h-40 sm:h-48 w-full flex-shrink-0 bg-gray-300'></div>
+      <div className="flex flex-col flex-grow p-3 sm:p-4 gap-2">
+          <div className="h-6 w-4/5 bg-gray-300 rounded"></div>
+          <div className="h-4 w-3/5 bg-gray-300 rounded"></div>
+          <div className="h-3 w-full bg-gray-300 rounded mt-1"></div>
+          <div className="h-3 w-full bg-gray-300 rounded"></div>
+          <div className="h-3 w-1/2 bg-gray-300 rounded mt-1"></div>
+      </div>
+    </div>
+  );
+};
+
 // Component to render all cause cards
-const Causes: React.FC<{ landfillId: string }> = ({ landfillId }) => {  // Accept landfillId as a prop here
+const Causes: React.FC<{ landfillId: string | null }> = ({ landfillId }) => { 
   const [waqfs, setWaqfs] = useState<Waqf[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     const fetchWaqfs = async () => {
+      setIsLoading(true);
+      setError(null);
+      setWaqfs([]); // Clear previous results
       try {
-        const response = await fetch('/api/waqfs');
+        // TODO: Modify API to filter by landfillId or location if needed
+        const response = await fetch('/api/waqfs'); 
         if (!response.ok) {
-          throw new Error('Failed to fetch waqfs');
+           const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to fetch waqfs');
         }
         const data = await response.json();
-        setWaqfs(data);
+        setWaqfs(data || []); // Default to empty array
       } catch (error: any) {
         console.error('Error fetching waqfs:', error);
-        setError(error.message);
+        setError(error.message || 'Could not load Waqf list.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchWaqfs();
-  }, []);
+    // Dependency array is empty: fetch only once on mount.
+    // Add landfillId here if the fetch should re-run when it changes (requires API modification)
+  }, []); 
+
+  if (isLoading) {
+     return (
+       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+         {[...Array(3)].map((_, index) => (
+            <CauseCardSkeleton key={index} />
+         ))}
+       </div>
+     );
+  }
 
   if (error) {
-    return <p className="text-red-500">{error}</p>;
+    return <p className="text-red-500 text-center p-6">{error}</p>;
+  }
+
+  if (waqfs.length === 0) {
+      return <p className="text-gray-500 text-center p-6">No Waqfs found.</p>;
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
       {waqfs.map((waqf) => (
         <CauseCard
           key={waqf.id}
@@ -93,7 +133,7 @@ const Causes: React.FC<{ landfillId: string }> = ({ landfillId }) => {  // Accep
           waqfPhoneNumber={waqf.waqfPhoneNumber}
           waqfAddress={waqf.waqfAddress}
           causes={waqf.causes}
-          landfillId={landfillId} // Pass landfillId to each CauseCard
+          landfillId={landfillId} // Pass landfillId down
         />
       ))}
     </div>

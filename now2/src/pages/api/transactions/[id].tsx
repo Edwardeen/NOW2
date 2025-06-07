@@ -18,18 +18,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     let transactions;
+    const whereClauseBase = {
+      NOT: {
+        AND: [
+          { transactionDeposited: true },
+          { transactionScreened: true },
+          { transactionTransformed: true },
+          { transactionTransfered: true },
+        ],
+      },
+    };
+
     if (userType === 'user') {
-      // Fetch transactions where UserID matches the user's ID
       transactions = await prisma.transactions.findMany({
         where: {
-          UserID: userId, // Use the user ID from the session
+          UserID: userId,
+          ...whereClauseBase,
         },
       });
     } else if (userType === 'entity') {
-      // Fetch transactions where EntityID matches the user's ID
       transactions = await prisma.transactions.findMany({
         where: {
-          EntityID: userId, // Use the entity ID from the session
+          EntityID: userId,
+          ...whereClauseBase,
         },
       });
     } else {

@@ -4,6 +4,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { SessionProvider } from 'next-auth/react';
+import { Analytics } from "@vercel/analytics/react"
 import "./globals.css";
 
 const geistSans = localFont({
@@ -29,6 +30,7 @@ export default function RootLayout({
       >
         <SessionProvider>
           {children}
+          <Analytics/>
         </SessionProvider>
       </body>
     </html>
